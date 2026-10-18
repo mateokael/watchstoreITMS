@@ -1,0 +1,2 @@
+# Mail log can contain reset links: never serve this folder
+Require all denied

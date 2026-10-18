@@ -1,0 +1,12 @@
+# Secrets: your own SMTP login. Copy mail_config.sample.php to mail_config.php and fill it in.
+includes/mail_config.php
+
+# Logs (dev mail log lives here)
+logs/*.log
+
+# Customer profile pictures are user data, not source code
+images/avatars/*
+!images/avatars/.gitkeep
+
+# NOTE: images/products/ is NOT ignored on purpose, so the watch photos you upload
+# as admin are committed and show up for everyone who clones the repo.
