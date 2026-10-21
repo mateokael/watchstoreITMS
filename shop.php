@@ -50,7 +50,7 @@ include('includes/header.php');
 
 <div class="page-head text-center">
   <?php if (!$filtering): ?>
-  <section class="hero hero-center">
+  <section class="hero hero-center shop-intro">
     <div>
       <h1>Find the watch that fits your wrist and your week.</h1>
       <p>Quartz for easy days, automatic for the ones you want to feel, solar for never thinking about batteries. Filter by what matters to you.</p>

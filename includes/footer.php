@@ -3,8 +3,9 @@
   <div class="container-fluid px-3 px-lg-5">
     <div class="row g-4 footer-cols">
       <div class="col-12 col-md-4">
-        <a class="footer-brand" href="<?= BASE_URL ?>/index.php">LANSTRO WATCHSTORE</a>
-        <p class="footer-text mt-3 mb-0">Flat shipping: <?= htmlspecialchars((string)((CURRENCY . number_format(SHIPPING_FEE, 2)))) ?> per order, however many watches you add. Nothing to pay online. You pay when the watch reaches you.</p>
+        <a class="footer-brand" href="<?= BASE_URL ?>/index.php">
+          <span class="brand-word">LANSTR</span><span class="brand-watch-o" aria-hidden="true"><span class="brand-watch-o__hand brand-watch-o__hand--hour"></span><span class="brand-watch-o__hand brand-watch-o__hand--minute"></span><span class="brand-watch-o__pin"></span><span class="brand-watch-o__crown"></span></span><span class="visually-hidden">O</span><span class="brand-word brand-word--tail">WATCHSTORE</span>
+        </a>
       </div>
       <div class="col-6 col-md-2">
         <h3 class="footer-title">Shop</h3>

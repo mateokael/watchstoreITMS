@@ -43,8 +43,8 @@ $soldOut = (int)$it['stock'] < 1;
 ?>
 <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="<?= BASE_URL ?>/shop.php">Shop</a></li><li class="breadcrumb-item active"><?= htmlspecialchars((string)(($it['brand'] . ' ' . $it['model']))) ?></li></ol></nav>
 
-<div class="row g-4">
-  <div class="col-md-6">
+<div class="product-detail row g-4 g-lg-5 align-items-start">
+  <div class="product-detail__gallery col-md-7">
     <?php if (count($images) > 1): ?>
       <div id="gallery" class="carousel slide main-shot" data-bs-ride="false">
         <div class="carousel-inner">
@@ -60,30 +60,21 @@ $soldOut = (int)$it['stock'] < 1;
     <?php endif; ?>
   </div>
 
-  <div class="col-md-6">
+  <div class="product-detail__info col-md-5">
     <div class="product-brand"><?= htmlspecialchars((string)$it['brand']) ?></div>
     <h1 class="mb-2"><?= htmlspecialchars((string)$it['model']) ?></h1>
     <?php if ($reviews): ?>
       <p class="rating mb-2"><?= (str_repeat('★', (int)round((float)$it['avg_rating'])) . str_repeat('☆', 5 - (int)round((float)$it['avg_rating']))) ?> <span class="text-secondary"><?= number_format((float)$it['avg_rating'], 1) ?> from <?= count($reviews) ?> review<?= count($reviews) === 1 ? '' : 's' ?></span></p>
     <?php endif; ?>
-    <p class="fs-3 price mb-3"><?= (CURRENCY . number_format($it['sell_price'], 2)) ?></p>
+    <p class="product-detail__price price mb-3"><?= (CURRENCY . number_format($it['sell_price'], 2)) ?></p>
     <?php if (!$it['is_active']): ?><div class="alert alert-secondary">This watch is archived and hidden from the shop (admin view).</div><?php endif; ?>
-    <p><?= nl2br(htmlspecialchars((string)$it['description'])) ?></p>
+    <p class="product-detail__availability mb-3"><span>Availability</span>
+      <?php if ($soldOut): ?><span class="availability-badge is-sold-out">Sold out</span>
+      <?php elseif ((int)$it['stock'] <= (int)$it['low_stock_level']): ?><span class="availability-badge is-low-stock">Only <?= (int)$it['stock'] ?> left</span>
+      <?php else: ?><span class="availability-badge is-in-stock">In stock</span><?php endif; ?>
+    </p>
 
-    <table class="table spec-table mb-3">
-      <tr><th>Movement</th><td><?= ucfirst($it['movement']) ?></td></tr>
-      <tr><th>For</th><td><?= ucfirst($it['category']) ?></td></tr>
-      <tr><th>Case size</th><td><?= $it['case_size_mm'] ? (int)$it['case_size_mm'] . ' mm' : 'Not listed' ?></td></tr>
-      <tr><th>Strap</th><td><?= htmlspecialchars((string)($it['strap_type'] ?: 'Not listed')) ?></td></tr>
-      <tr><th>Water resistance</th><td><?= htmlspecialchars((string)($it['water_resistance'] ?: 'Not listed')) ?></td></tr>
-      <tr><th>Availability</th><td>
-        <?php if ($soldOut): ?><span class="badge bg-secondary">Sold out</span>
-        <?php elseif ((int)$it['stock'] <= (int)$it['low_stock_level']): ?><span class="badge bg-warning text-dark">Only <?= (int)$it['stock'] ?> left</span>
-        <?php else: ?><span class="badge bg-success">In stock</span><?php endif; ?>
-      </td></tr>
-    </table>
-
-    <div class="d-flex flex-wrap gap-2 align-items-end">
+    <div class="product-purchase d-flex flex-wrap gap-2 align-items-end">
       <form method="post" action="<?= BASE_URL ?>/cart_update.php" class="d-flex gap-2 align-items-end">
 <?= '<input type="hidden" name="back" value="' . htmlspecialchars($_SERVER['REQUEST_URI']) . '">' ?>
         <input type="hidden" name="action" value="add">
@@ -92,7 +83,7 @@ $soldOut = (int)$it['stock'] < 1;
           <label for="qty" class="form-label small mb-1">Quantity</label>
           <input type="number" class="form-control" style="width:90px" id="qty" name="qty" value="1" min="1" max="<?= max(1, (int)$it['stock']) ?>" <?= $soldOut ? 'disabled' : '' ?>>
         </div>
-        <button class="btn btn-brass" type="submit" <?= $soldOut ? 'disabled' : '' ?>>Add to cart</button>
+        <button class="btn btn-brass product-detail__add" type="submit" <?= $soldOut ? 'disabled' : '' ?>>Add to cart</button>
       </form>
       <?php if (isset($_SESSION['user_id'])): ?>
         <form method="post" action="<?= BASE_URL ?>/user/wishlist_toggle.php">
@@ -102,6 +93,16 @@ $soldOut = (int)$it['stock'] < 1;
         </form>
       <?php endif; ?>
     </div>
+
+    <p class="mt-4"><?= nl2br(htmlspecialchars((string)$it['description'])) ?></p>
+
+    <table class="table spec-table mb-3">
+      <tr><th>Movement</th><td><?= ucfirst($it['movement']) ?></td></tr>
+      <tr><th>For</th><td><?= ucfirst($it['category']) ?></td></tr>
+      <tr><th>Case size</th><td><?= $it['case_size_mm'] ? (int)$it['case_size_mm'] . ' mm' : 'Not listed' ?></td></tr>
+      <tr><th>Strap</th><td><?= htmlspecialchars((string)($it['strap_type'] ?: 'Not listed')) ?></td></tr>
+      <tr><th>Water resistance</th><td><?= htmlspecialchars((string)($it['water_resistance'] ?: 'Not listed')) ?></td></tr>
+    </table>
   </div>
 </div>
 

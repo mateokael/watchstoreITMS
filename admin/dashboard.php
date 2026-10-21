@@ -43,15 +43,18 @@ $recent = mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT o.orderinfo_id, o
                   GROUP BY o.orderinfo_id ORDER BY o.orderinfo_id DESC LIMIT 5'), MYSQLI_ASSOC);
 
 $pageTitle = 'Dashboard';
+$containerClass = 'container-fluid px-3 px-lg-5 admin-open-page admin-dashboard';
 include('../includes/header.php');
 ?>
-<h1 class="mb-3">Dashboard</h1>
-
-<div class="row g-3 mb-4">
-  <div class="col-6 col-lg-3"><div class="stat"><div class="text-secondary small">Sales (open + completed orders)</div><div class="figure"><?= (CURRENCY . number_format($sales['revenue'], 2)) ?></div></div></div>
-  <div class="col-6 col-lg-3"><div class="stat"><div class="text-secondary small">Estimated profit</div><div class="figure"><?= (CURRENCY . number_format($sales['profit'], 2)) ?></div></div></div>
-  <div class="col-6 col-lg-3"><div class="stat"><div class="text-secondary small">Watches sold</div><div class="figure"><?= (int)$sales['units'] ?></div></div></div>
-  <div class="col-6 col-lg-3"><div class="stat"><div class="text-secondary small">Customers</div><div class="figure"><?= $customers ?></div></div></div>
+<section class="dashboard-overview">
+  <h1 class="admin-page-title mb-4">Dashboard</h1>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3"><div class="stat"><div class="text-secondary small">Sales (open + completed orders)</div><div class="figure"><?= (CURRENCY . number_format($sales['revenue'], 2)) ?></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat"><div class="text-secondary small">Estimated profit</div><div class="figure"><?= (CURRENCY . number_format($sales['profit'], 2)) ?></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat"><div class="text-secondary small">Watches sold</div><div class="figure"><?= (int)$sales['units'] ?></div></div></div>
+    <div class="col-6 col-lg-3"><div class="stat"><div class="text-secondary small">Customers</div><div class="figure"><?= $customers ?></div></div></div>
+  </div>
+</section>
 </div>
 
 <div class="d-flex flex-wrap gap-2 mb-3 no-print">

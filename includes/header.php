@@ -3,6 +3,8 @@
 $pageTitle = $pageTitle ?? 'LANSTRO WATCHSTORE';
 $containerClass = $containerClass ?? 'container';
 $cartN = array_sum($_SESSION['cart'] ?? []);
+$currentPage = basename((string)($_SERVER['PHP_SELF'] ?? ''));
+$shopIsActive = in_array($currentPage, ['shop.php', 'product.php'], true);
 ?>
 <!doctype html>
 <html lang="en">
@@ -27,7 +29,9 @@ $cartN = array_sum($_SESSION['cart'] ?? []);
             <span class="navbar-toggler-icon"></span>
           </button>
         </div>
-        <a class="navbar-brand" href="<?= BASE_URL ?>/index.php">LANSTRO WATCHSTORE</a>
+        <a class="navbar-brand" href="<?= BASE_URL ?>/index.php">
+          <span class="brand-word">LANSTR</span><span class="brand-watch-o" aria-hidden="true"><span class="brand-watch-o__hand brand-watch-o__hand--hour"></span><span class="brand-watch-o__hand brand-watch-o__hand--minute"></span><span class="brand-watch-o__pin"></span><span class="brand-watch-o__crown"></span></span><span class="visually-hidden">O</span><span class="brand-word brand-word--tail">WATCHSTORE</span>
+        </a>
         <ul class="navbar-nav flex-row align-items-center top-right">
           <li class="nav-item">
             <form method="get" action="<?= BASE_URL ?>/shop.php" class="header-search" role="search">
@@ -63,7 +67,9 @@ $cartN = array_sum($_SESSION['cart'] ?? []);
       </div>
       <div class="collapse navbar-collapse justify-content-center" id="nav">
         <ul class="navbar-nav main-menu">
-          <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/shop.php">Shop</a></li>
+          <li class="nav-item"><a class="nav-link<?= $shopIsActive ? ' is-current' : '' ?>" href="<?= BASE_URL ?>/shop.php"<?= $shopIsActive ? ' aria-current="page"' : '' ?>>Shop</a></li>
+          <li class="nav-item"><a class="nav-link<?= $currentPage === 'about.php' ? ' is-current' : '' ?>" href="<?= BASE_URL ?>/about.php"<?= $currentPage === 'about.php' ? ' aria-current="page"' : '' ?>>About Us</a></li>
+          <li class="nav-item"><a class="nav-link<?= $currentPage === 'contact.php' ? ' is-current' : '' ?>" href="<?= BASE_URL ?>/contact.php"<?= $currentPage === 'contact.php' ? ' aria-current="page"' : '' ?>>Contact Us</a></li>
           <?php if ((($_SESSION['role'] ?? '') === 'admin')): ?>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>

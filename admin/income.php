@@ -60,28 +60,31 @@ $quick = [
 ];
 
 $pageTitle = 'Income';
+$containerClass = 'container-fluid px-3 px-lg-5 admin-open-page admin-income';
 include('../includes/header.php');
 ?>
+<section class="income-overview">
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-  <h1 class="mb-0">Shop income</h1>
-  <button class="btn btn-outline-primary no-print" type="button" onclick="window.print()"><i class="fa-solid fa-print"></i> Print / Save as PDF</button>
+  <h1 class="admin-page-title mb-0">Shop income</h1>
+  <button class="btn btn-outline-light no-print" type="button" onclick="window.print()"><i class="fa-solid fa-print"></i> Print / Save as PDF</button>
 </div>
 <p class="text-secondary">Pick a date range to see how much the shop earned. A sale counts on the day the order was <strong>delivered</strong>; pending and cancelled orders are not income.</p>
 
 <form method="get" class="row g-2 align-items-end mb-2 no-print">
   <div class="col-auto"><label class="form-label small mb-0" for="from">From</label><input type="date" class="form-control" id="from" name="from" value="<?= htmlspecialchars((string)$from) ?>" max="<?= htmlspecialchars((string)$today) ?>"></div>
   <div class="col-auto"><label class="form-label small mb-0" for="to">To</label><input type="date" class="form-control" id="to" name="to" value="<?= htmlspecialchars((string)$to) ?>"></div>
-  <div class="col-auto"><button class="btn btn-primary" type="submit">Show income</button></div>
+  <div class="col-auto"><button class="btn btn-light" type="submit">Show income</button></div>
 </form>
 <div class="d-flex flex-wrap gap-2 mb-4 no-print">
   <?php foreach ($quick as $label => [$f, $t]): ?>
-    <a class="btn btn-sm btn-outline-secondary" href="<?= BASE_URL . '/admin/income.php?from=' . $f . '&to=' . $t ?>"><?= htmlspecialchars((string)$label) ?></a>
+    <a class="btn btn-sm btn-outline-light" href="<?= BASE_URL . '/admin/income.php?from=' . $f . '&to=' . $t ?>"><?= htmlspecialchars((string)$label) ?></a>
   <?php endforeach; ?>
 </div>
 
-<h2 class="h5 mb-3"><?= htmlspecialchars((string)(date('M j, Y', strtotime($from)))) ?> &ndash; <?= htmlspecialchars((string)(date('M j, Y', strtotime($to)))) ?></h2>
+<h2 class="admin-section-title mb-3"><?= htmlspecialchars((string)(date('M j, Y', strtotime($from)))) ?> &ndash; <?= htmlspecialchars((string)(date('M j, Y', strtotime($to)))) ?></h2>
+</section>
 <div class="row g-3 mb-4">
-  <div class="col-12 col-lg-4"><div class="stat h-100" style="border-color:#000"><div class="text-secondary small">Total income</div><div class="figure"><?= (CURRENCY . number_format($sum['income'], 2)) ?></div><div class="small text-secondary"><?= (CURRENCY . number_format($sum['sales'], 2)) ?> watches + <?= (CURRENCY . number_format($sum['shipping'], 2)) ?> shipping</div></div></div>
+  <div class="col-12 col-lg-4"><div class="stat h-100"><div class="text-secondary small">Total income</div><div class="figure"><?= (CURRENCY . number_format($sum['income'], 2)) ?></div><div class="small text-secondary"><?= (CURRENCY . number_format($sum['sales'], 2)) ?> watches + <?= (CURRENCY . number_format($sum['shipping'], 2)) ?> shipping</div></div></div>
   <div class="col-6 col-lg-2"><div class="stat h-100"><div class="text-secondary small">Orders delivered</div><div class="figure"><?= $sum['orders'] ?></div><div class="small text-secondary"><?= $sum['units'] ?> watches</div></div></div>
   <div class="col-6 col-lg-2"><div class="stat h-100"><div class="text-secondary small">Gross profit</div><div class="figure"><?= (CURRENCY . number_format($sum['gross_profit'], 2)) ?></div><div class="small text-secondary">sales &minus; cost</div></div></div>
   <div class="col-6 col-lg-2"><div class="stat h-100"><div class="text-secondary small">Expenses</div><div class="figure"><?= (CURRENCY . number_format($sum['expenses'], 2)) ?></div></div></div>

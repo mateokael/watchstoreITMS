@@ -181,9 +181,11 @@ if ($r === 'customer') {
 }
 
 $pageTitle = $r ? $titles[$r] : 'Reports';
+$containerClass = 'container-fluid px-3 px-lg-5 admin-open-page admin-reports';
 include('../includes/header.php');
 ?>
-<h1 class="mb-3">Reports</h1>
+<section class="reports-overview">
+<h1 class="admin-page-title mb-4">Reports</h1>
 
 <form method="get" class="panel no-print">
   <div class="rep-toolbar">
@@ -208,10 +210,11 @@ include('../includes/header.php');
     <?php endforeach; ?>
   </div>
 </form>
+</section>
 
 <?php if ($r): ?>
   <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4 mb-1">
-    <h2 class="h3 mb-0"><?= htmlspecialchars((string)$titles[$r]) ?></h2>
+    <h2 class="admin-section-title mb-0"><?= htmlspecialchars((string)$titles[$r]) ?></h2>
     <button class="btn btn-outline-primary no-print" type="button" onclick="window.print()"><i class="fa-solid fa-print"></i> Print / Save as PDF</button>
   </div>
   <p class="text-secondary"><?= htmlspecialchars((string)$notes[$r]) ?> Range: <?= htmlspecialchars((string)(date('M j, Y', strtotime($from)))) ?> &ndash; <?= htmlspecialchars((string)(date('M j, Y', strtotime($to)))) ?>.</p>
