@@ -7,8 +7,22 @@ Plain PHP + MySQLi + Bootstrap 5 (includes, one page per job, session cart).
 2. Start Apache and MySQL, open phpMyAdmin, **Import** `database.sql` (it creates `db_watchstoreproj`).
    - Already have the old database with data? Run `migration.sql` instead (once). It adds usernames, profile pictures and the password-reset table without deleting anything.
 3. Open `http://localhost/<your-folder>/`
-4. Admin login: `admin` (or `admin@watchstore.test`) / `admin123`. Change it from **My profile**.
+4. Admin login: `admin@watchstore.test` / `admin123`. Change it from **My profile**.
 5. Settings (currency, shipping fee, DB login) are at the top of `includes/config.php`.
+
+## ITIM211 rubric coverage
+
+| Requirement | Implementation |
+|---|---|
+| MP1 watch product CRUD, single and multiple photos | Admin watch forms, validated uploads and product gallery: `item/`, `includes/upload_one.php`, `includes/upload_many.php`, `product.php` |
+| MP2 user CRUD, registration/profile photos, deactivation and role changes | `user/register.php`, `user/profile.php`, `admin/users.php`, `admin/user_status.php`, `admin/user_role.php` |
+| MP3 email login, logout and role-based CRUD restrictions | `user/login.php`, `user/logout.php`, `includes/guard_login.php`, `includes/guard_admin.php`; guests receive a login redirect/message |
+| MP4 verified-purchase reviews, detail-page display/update and foul-word filtering | Delivered customers can create or update one review per product; `product.php`, `user/review_store.php`, `includes/badwords.php` |
+| MP5 PHP-only login and product-form validation | `user/login.php` and shared `includes/item_validate.php`; the forms disable browser validation |
+| Term test: completed orders, admin status updates, customer email and PDF receipt | `checkout.php`, `admin/orders.php`, `admin/updateOrder.php`, `includes/order_email.php`, `includes/receipt_pdf.php`; SQL uses `mysqli_execute_query()` |
+| Unit 1: normalized schema and order-detail views | Tables and relationships in `database.sql`; `v_order_details` and `v_order_totals` power order details and totals |
+| Unit 2: execution and interface | XAMPP setup and guided flows in this README; responsive storefront and admin pages use Bootstrap |
+| Quiz 3: homepage search | Search from `index.php` submits to the shop's prepared, parameterized product search in `shop.php` |
 
 ## Version 3: employees, expenses, reports (class requirements)
 **Already have the database imported?** Run `migration.sql` once (the new part is at the bottom, "Version 3"). New setup: import `database.sql`, then optionally `sample_data.sql` for demo orders, expenses and accounts (password for all demo accounts: `admin123`).
@@ -37,7 +51,7 @@ Charts use Chart.js from a CDN (like Bootstrap), so the computer needs internet 
 | **Home page** with log in / create account buttons for guests, welcome message when logged in, new arrivals | `index.php` |
 | Shop with filters (the old home page) | `shop.php` |
 | **Profile like Facebook**: picture on the left, credentials on the right (username, email, delivery details, password) | `user/profile.php` |
-| **Unique usernames** (case-insensitive: `Sam` and `sam` are the same name). Log in with username **or** email | `user/register.php`, `user/store.php`, `user/login.php` |
+| **Unique usernames** (case-insensitive: `Sam` and `sam` are the same name). Log in with email | `user/register.php`, `user/store.php`, `user/login.php` |
 | **Item archive**: Archive takes a watch out of the shop, Restore brings it back. Nothing is deleted, old orders keep working | `item/index.php`, `item/archive.php` |
 | **Emails**: welcome, order confirmation, shipped, delivered, cancelled, forgot password, password changed, optional new-order alert to the admin | `includes/order_email.php`, `includes/account_email.php`, `includes/mail_send.php` |
 | **Forgot password** (link valid 1 hour, one use, only a hash is stored) | `user/forgot_password.php`, `user/reset_password.php` |
@@ -46,18 +60,19 @@ Charts use Chart.js from a CDN (like Bootstrap), so the computer needs internet 
 ## Email setup
 Out of the box email is in **log mode**: nothing is sent, each email is written to `logs/mail.log` (open it to copy the reset link while testing).
 
-To send real email:
+To send email through the required Mailtrap service:
 1. Copy `includes/mail_config.sample.php` to `includes/mail_config.php`.
-2. Set `MAIL_MODE` to `'smtp'` and fill in your mail account. For Gmail turn on 2-Step Verification and create an **App password**; never use your normal password.
-3. `mail_config.php` is in `.gitignore`, so your password is not pushed to GitHub.
+2. Set the `MAILTRAP_USER` and `MAILTRAP_PASS` environment variables to the credentials for your Mailtrap Email Testing inbox before starting Apache. SMTP mode is enabled when both are set; otherwise emails stay in log mode.
+3. `mail_config.php` is in `.gitignore`, so credentials are not pushed to GitHub. Never commit Mailtrap credentials.
 
 PHPMailer is bundled in `includes/PHPMailer/`, so there is nothing to install with Composer. If an email fails to send, the order or account action still goes through and the reason is written to `logs/mail-error.log`.
 
 ## Images and GitHub
 - Watch photos the admin uploads go to **`images/products/`**. Profile pictures go to **`images/avatars/`**.
-- The database stores a path like `images/products/watch_ab12cd.jpg`. The pages build the image link from it, and show `assets/placeholder.svg` if the file is missing, so you never get a broken image.
+- In the admin watch form, select the main photo and use **Add another photo** to create a separate picker for each gallery photo. The main photo appears first on the product page; the arrows navigate through the additional photos.
+- The database stores a relative path like `images/products/watch_ab12cd.jpg`. The pages build the image link from it, and show `assets/placeholder.svg` if the file is missing, so you never get a broken image.
 - Images used to break after cloning because the folder name was typed into `BASE_URL`. It is now detected from where the project sits, so it works in any folder.
-- `images/products/` is **not** ignored by git, so after uploading photos run `git add images` and push. Avatars are ignored (they are user data).
+- `images/products/` is **not** ignored by git. Uploaded photos are saved there, but to make them available on GitHub you still need to commit the files along with the database export/seed data that references their relative paths. Avatars are ignored (they are user data).
 - The database is not part of the repo. If you want the watches (with their photos) to appear for whoever clones the project, export your database from phpMyAdmin and replace `database.sql`.
 
 ## Where each function lives
@@ -94,7 +109,7 @@ Also: low-stock alerts, multiple photos, reviews (buyers only), wishlist, sales 
 - Order status moves one way: pending, shipped, delivered, or pending/cancelled. Cancelling returns stock.
 
 ## Manual test checklist
-1. Register (try a taken username, in a different case), log in with the username and with the email.
+1. Register (try a taken username, in a different case), then log in with the email address. Username-only login should not work.
 2. Profile: upload a picture, change username, save delivery details, change password.
 3. Admin: add a watch with photos, check the file appears in `images/products/`, archive it, find it under Archived, restore it.
 4. Customer: add to cart, check out, check `logs/mail.log` (or your inbox) for the confirmation.

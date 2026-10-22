@@ -35,6 +35,11 @@ include('includes/header.php');
         <a class="btn btn-outline-light btn-lg" href="<?= BASE_URL ?>/user/register.php">Create account</a>
       </div>
     <?php endif; ?>
+    <form class="d-flex gap-2 mt-4" method="get" action="<?= BASE_URL ?>/shop.php" role="search">
+      <label class="visually-hidden" for="home-search">Search watches</label>
+      <input class="form-control" id="home-search" type="search" name="q" placeholder="Search by brand or model" aria-label="Search watches">
+      <button class="btn btn-brass flex-shrink-0" type="submit">Search</button>
+    </form>
   </div>
 </section>
 

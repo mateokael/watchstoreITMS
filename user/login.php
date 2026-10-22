@@ -7,18 +7,16 @@ if (isset($_SESSION['user_id'])) {
 }
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
-    $login = trim($_POST['login'] ?? '');      // username OR email
+    $email = trim($_POST['email'] ?? '');
     $pass  = (string)($_POST['password'] ?? '');
 
     $errors = [];
-    if ($login === '') {
-        $errors['login'] = 'Enter your email address.';
-    } elseif (strlen($login) > 100) {
-        $errors['login'] = 'That is too long. Use at most 100 characters.';
-    } elseif (str_contains($login, '@') && !filter_var($login, FILTER_VALIDATE_EMAIL)) {
-        $errors['login'] = 'That does not look like a valid email address.';
-    } elseif (!str_contains($login, '@') && !preg_match('/^[A-Za-z0-9._-]{3,20}$/', $login)) {
-        $errors['login'] = 'Enter your email address (or your username: letters, numbers, dots, dashes, underscores).';
+    if ($email === '') {
+        $errors['email'] = 'Enter your email address.';
+    } elseif (strlen($email) > 100) {
+        $errors['email'] = 'That is too long. Use at most 100 characters.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'That does not look like a valid email address.';
     }
     if ($pass === '') {
         $errors['password'] = 'Enter your password.';
@@ -27,17 +25,17 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     }
 
     if (!$errors) {
-        $row = mysqli_fetch_assoc(mysqli_execute_query($conn, 'SELECT user_id, username, email, password, role, status, profile_pic FROM users WHERE email = ? OR username = ? LIMIT 1', [$login, $login]));
+        $row = mysqli_fetch_assoc(mysqli_execute_query($conn, 'SELECT user_id, username, email, password, role, status, profile_pic FROM users WHERE email = ? LIMIT 1', [$email]));
         if ($row && password_verify($pass, $row['password'])) {
             if ($row['status'] !== 'active') {
-                $errors['login'] = 'This account has been deactivated. Please contact the store.';
+                $errors['email'] = 'This account has been deactivated. Please contact the store.';
             } else {
                 session_regenerate_id(true);
                 $_SESSION['user_id'] = (int)$row['user_id'];
-    $_SESSION['email'] = $row['email'];
-    $_SESSION['role'] = $row['role'];
-    $_SESSION['username'] = $row['username'];
-    $_SESSION['avatar'] = $row['profile_pic'] ?? null;
+                $_SESSION['email'] = $row['email'];
+                $_SESSION['role'] = $row['role'];
+                $_SESSION['username'] = $row['username'];
+                $_SESSION['avatar'] = $row['profile_pic'] ?? null;
                 $next = $_SESSION['next'] ?? null;
                 unset($_SESSION['next']);
                 unset($_SESSION['old'], $_SESSION['errors']);
@@ -57,10 +55,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 exit();
             }
         } else {
-            $errors['password'] = 'Wrong email/username or password.';
+            $errors['password'] = 'Wrong email or password.';
         }
     }
-    $_SESSION['old'] = ['login' => $login];
+    $_SESSION['old'] = ['email' => $email];
     $_SESSION['errors'] = $errors;
     $_SESSION['message'] = 'We could not log you in. Please fix the highlighted fields.';
     header('Location: ' . BASE_URL . '/user/login.php');
@@ -75,9 +73,9 @@ include('../includes/header.php');
     <h1 class="mb-3">Log in</h1>
     <form class="panel" method="post" novalidate>
       <div class="mb-3">
-        <label for="login" class="form-label">Email</label>
-        <input type="text" class="form-control<?= (isset($_SESSION['errors']['login']) ? ' is-invalid' : '') ?>" id="login" name="login" value="<?= htmlspecialchars((string)($_SESSION['old']['login'] ?? '')) ?>" autocomplete="username">
-        <?= (isset($_SESSION['errors']['login']) ? '<div class="invalid-feedback d-block">' . htmlspecialchars($_SESSION['errors']['login']) . '</div>' : '') ?>
+        <label for="email" class="form-label">Email</label>
+        <input type="text" class="form-control<?= (isset($_SESSION['errors']['email']) ? ' is-invalid' : '') ?>" id="email" name="email" value="<?= htmlspecialchars((string)($_SESSION['old']['email'] ?? '')) ?>" autocomplete="email">
+        <?= (isset($_SESSION['errors']['email']) ? '<div class="invalid-feedback d-block">' . htmlspecialchars($_SESSION['errors']['email']) . '</div>' : '') ?>
       </div>
       <div class="mb-3">
         <div class="d-flex justify-content-between"><label for="password" class="form-label">Password</label><a class="small" href="<?= BASE_URL ?>/user/forgot_password.php">Forgot password?</a></div>

@@ -4,7 +4,7 @@ if (!isset($_SESSION['user_id'])) {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $_SESSION['next'] = $_SERVER['REQUEST_URI'];
     }
-    $_SESSION['warning'] = 'Please log in to continue.';
+    $_SESSION['warning'] = 'Please log in to your account to access that page.';
     header('Location: ' . BASE_URL . '/user/login.php');
     exit();
 }

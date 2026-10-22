@@ -1,5 +1,5 @@
 <?php
-// For <input type="file" name="gallery[]" multiple>.
+// For one or more <input type="file" name="gallery[]"> fields.
 $upPaths = [];
 $upError = null;
 $upPrefix = 'watch_';

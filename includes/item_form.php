@@ -37,8 +37,14 @@ $gallery = $gallery ?? [];
           <?php if ($item && $item['img_path']): ?><img class="admin-thumb mt-2" style="width:96px;height:96px" src="<?= htmlspecialchars((string)((is_file(ROOT_DIR . '/' . $item['img_path']) ? BASE_URL . '/' . $item['img_path'] : BASE_URL . '/assets/placeholder.svg'))) ?>" alt="Current main photo"><?php endif; ?>
         </div>
         <div class="col-md-6">
-          <label class="form-label" for="gallery">More photos (optional)</label>
-          <input type="file" class="form-control" id="gallery" name="gallery[]" accept="image/jpeg,image/png,image/webp" multiple>
+          <label class="form-label" for="gallery-photo-1">More photos (optional)</label>
+          <div id="gallery-uploads" class="d-grid gap-2">
+            <div class="input-group gallery-upload-row">
+              <input type="file" class="form-control" id="gallery-photo-1" name="gallery[]" accept="image/jpeg,image/png,image/webp">
+            </div>
+          </div>
+          <button class="btn btn-sm btn-outline-primary mt-2" id="add-gallery-photo" type="button" hidden>Add another photo</button>
+          <div class="form-text">Each photo must be JPG, PNG or WEBP, up to 3 MB.</div>
           <?php if ($gallery): ?>
             <div class="d-flex flex-wrap gap-3 mt-2">
               <?php foreach ($gallery as $g): ?>
@@ -56,4 +62,37 @@ $gallery = $gallery ?? [];
         <a class="btn btn-outline-primary" href="<?= BASE_URL ?>/item/index.php">Cancel</a>
       </div>
     </form>
+<script>
+(() => {
+  const uploads = document.getElementById('gallery-uploads');
+  const addButton = document.getElementById('add-gallery-photo');
+  if (!uploads || !addButton) return;
+
+  let photoNumber = 1;
+  addButton.hidden = false;
+  addButton.addEventListener('click', () => {
+    photoNumber += 1;
+    const row = document.createElement('div');
+    row.className = 'input-group gallery-upload-row';
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.className = 'form-control';
+    input.id = `gallery-photo-${photoNumber}`;
+    input.name = 'gallery[]';
+    input.accept = 'image/jpeg,image/png,image/webp';
+
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'btn btn-outline-danger';
+    removeButton.textContent = 'Remove';
+    removeButton.setAttribute('aria-label', `Remove photo ${photoNumber} picker`);
+    removeButton.addEventListener('click', () => row.remove());
+
+    row.append(input, removeButton);
+    uploads.append(row);
+    input.focus();
+  });
+})();
+</script>
 <?php unset($_SESSION['old'], $_SESSION['errors']); ?>
