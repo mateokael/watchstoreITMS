@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $uid  = (int)$_SESSION['user_id'];
 $id   = (int)($_POST['item_id'] ?? 0);
 $back = $_POST['back'] ?? '';
-if (!str_starts_with($back, BASE_URL . '/') || str_starts_with($back, '//')) {   // only links back into this site are allowed
-    $back = BASE_URL . '/' . 'user/wishlist.php';
+if (!str_starts_with($back, BASE_URL . '/') || str_starts_with($back, '//')) {   // Restrict redirects to this site.
+    $back = BASE_URL . '/user/wishlist.php';
 }
 
 if (!mysqli_fetch_row(mysqli_execute_query($conn, 'SELECT 1 FROM item WHERE item_id = ?', [$id]))) {

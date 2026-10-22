@@ -1,5 +1,5 @@
 <?php
-// Save (or edit) a review. Only customers whose order for this watch was DELIVERED can review it. Foul language is refused with a message.
+// Save reviews only for delivered purchases and reject foul language.
 session_start();
 include('../includes/config.php');
 include('../includes/guard_login.php');

@@ -18,7 +18,8 @@ foreach ($ids as $k => $iid) {
     $iid = (int)$iid;
     $q   = (int)($qtys[$k] ?? 0);
     if ($iid > 0 && $q > 0) {
-        $want[$iid] = ($want[$iid] ?? 0) + $q;
+        $want[$iid] ??= 0;
+        $want[$iid] += $q;
     }
 }
 
@@ -75,7 +76,7 @@ include('../includes/receipt_issue.php');
 if ($method === 'print') {
     mysqli_execute_query($conn, "UPDATE receipt SET method = 'print', printed_at = NOW() WHERE orderinfo_id = ?", [$orderId]);
     $_SESSION['success'] = "Sale #$orderId completed.";
-    header('Location: ' . BASE_URL . '/' . 'user/receipt.php?id=' . $orderId . '&autoprint=1');
+    header('Location: ' . BASE_URL . '/user/receipt.php?id=' . $orderId . '&autoprint=1');
     exit();
 }
 include('../includes/receipt_send.php');
@@ -85,5 +86,5 @@ if ($sent) {
 } else {
     $_SESSION['warning'] = "Sale #$orderId completed, but the email could not be sent. You can resend or print it from the order page.";
 }
-header('Location: ' . BASE_URL . '/' . 'admin/orderDetails.php?id=' . $orderId);
+header('Location: ' . BASE_URL . '/admin/orderDetails.php?id=' . $orderId);
 exit();

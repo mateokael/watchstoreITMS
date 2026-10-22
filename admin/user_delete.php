@@ -1,5 +1,5 @@
 <?php
-// Admin: delete an account. Customers with orders are protected (orders and reports need them): deactivate instead.
+// Accounts with orders must be deactivated, not deleted.
 session_start();
 include('../includes/config.php');
 include('../includes/guard_admin.php');
@@ -9,7 +9,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $id = (int)($_POST['user_id'] ?? 0);
-$u = mysqli_fetch_assoc(mysqli_execute_query($conn, "SELECT username, profile_pic FROM users WHERE user_id = ? AND user_id <> " . (int)$_SESSION['user_id'], [$id]));
+$u = mysqli_fetch_assoc(mysqli_execute_query(
+    $conn,
+    'SELECT username, profile_pic FROM users WHERE user_id = ? AND user_id <> ?',
+    [$id, (int)$_SESSION['user_id']]
+));
 if (!$u) {
     $_SESSION['message'] = 'That account does not exist.';
 } elseif ((int)(mysqli_fetch_row(mysqli_execute_query($conn, 'SELECT COUNT(*) FROM orderinfo o INNER JOIN customer c ON c.customer_id = o.customer_id WHERE c.user_id = ?', [$id])) ?? [null])[0] > 0) {

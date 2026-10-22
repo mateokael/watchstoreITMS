@@ -1,7 +1,4 @@
--- OPTIONAL demo data so the reports, charts and income page have something to show.
--- Import AFTER database.sql (select db_watchstoreproj > Import). Every demo account's password is: admin123
--- Dates are relative to the day you import, so "This month" and "Last month" always have data.
--- Demo orders do not touch the stock numbers.
+-- Optional demo accounts use admin123; dates are relative to import and orders do not change stock.
 USE db_watchstoreproj;
 
 INSERT INTO users (username, email, password, role) VALUES
@@ -121,7 +118,7 @@ SELECT ec.category_id, d.descr, d.amt, DATE_SUB(CURDATE(), INTERVAL d.ago DAY), 
   SELECT 'Delivery / courier' cat, 3 ago, 'Courier pickup fees' descr, 750.00 amt
 ) d INNER JOIN expense_category ec ON ec.name = d.cat COLLATE utf8mb4_unicode_ci;
 
--- receipts for the demo delivered orders (half emailed, half printed by the employee)
+-- Add sample receipts for delivered demo orders.
 INSERT INTO receipt (orderinfo_id, method, issued_by, issued_at, emailed_at, printed_at)
 SELECT o.orderinfo_id, IF(o.orderinfo_id % 2 = 0, 'email', 'print'), (SELECT user_id FROM users WHERE username = 'employee1'),
        o.date_delivered, IF(o.orderinfo_id % 2 = 0, o.date_delivered, NULL), IF(o.orderinfo_id % 2 = 0, NULL, o.date_delivered)

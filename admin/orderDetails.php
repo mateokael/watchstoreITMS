@@ -15,7 +15,7 @@ $rcp      = $o['status'] === 'delivered' ? mysqli_fetch_assoc(mysqli_execute_que
 $subtotal = array_sum(array_column($lines, 'line_total'));
 $next     = ($nextStatuses[$o['status']] ?? []);
 if (!(($_SESSION['role'] ?? '') === 'admin')) {
-    $next = array_values(array_diff($next, ['cancelled']));   // employees confirm and deliver; cancelling is the admin's call
+    $next = array_values(array_diff($next, ['cancelled']));   // Only admins can cancel orders.
 }
 
 $pageTitle = 'Order #' . $id;

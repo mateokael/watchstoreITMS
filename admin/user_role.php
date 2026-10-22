@@ -1,5 +1,5 @@
 <?php
-// Admin: change the role of an ACTIVE account (customer / employee / admin). Takes effect on that person's next page load.
+// Change the role of an active account.
 session_start();
 include('../includes/config.php');
 include('../includes/guard_admin.php');

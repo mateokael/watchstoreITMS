@@ -25,5 +25,5 @@ if ($err) {
 } else {
     $_SESSION['success'] = "Order #$id was cancelled.";
 }
-header('Location: ' . BASE_URL . '/' . 'user/order_view.php?id=' . $id);
+header('Location: ' . BASE_URL . '/user/order_view.php?id=' . $id);
 exit();

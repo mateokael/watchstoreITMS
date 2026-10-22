@@ -24,16 +24,23 @@ $subtotal = array_sum(array_column($lines, 'subtotal'));
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     mysqli_begin_transaction($conn);
     try {
-        $prices = [];
-        $costs  = [];
+        $orderItems = [];
         foreach ($lines as $l) {
-            $row = mysqli_fetch_assoc(mysqli_execute_query($conn, 'SELECT s.quantity, i.sell_price, i.cost_price, i.is_active FROM stock s
-                           JOIN item i ON i.item_id = s.item_id WHERE s.item_id = ? FOR UPDATE', [(int)$l['item_id']]));
+            $itemId = (int)$l['item_id'];
+            $row = mysqli_fetch_assoc(mysqli_execute_query(
+                $conn,
+                'SELECT s.quantity, i.sell_price, i.cost_price, i.is_active
+                 FROM stock s JOIN item i ON i.item_id = s.item_id
+                 WHERE s.item_id = ? FOR UPDATE',
+                [$itemId]
+            ));
             if (!$row || !$row['is_active'] || (int)$row['quantity'] < (int)$l['qty']) {
-                throw new RuntimeException(($l['brand'] . ' ' . $l['model']) . ' just ran low on stock. Please check your cart.');
+                throw new DomainException($l['brand'] . ' ' . $l['model'] . ' just ran low on stock. Please check your cart.');
             }
-            $prices[(int)$l['item_id']] = (float)$row['sell_price'];
-            $costs[(int)$l['item_id']]  = (float)$row['cost_price'];
+            $orderItems[$itemId] = [
+                'price' => (float)$row['sell_price'],
+                'cost' => (float)$row['cost_price'],
+            ];
         }
 
         $pref = ($_POST['receipt_pref'] ?? 'email') === 'print' ? 'print' : 'email';
@@ -42,16 +49,18 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
         foreach ($lines as $l) {
             $iid = (int)$l['item_id'];
-            mysqli_execute_query($conn, 'INSERT INTO orderline (orderinfo_id, item_id, quantity, unit_price, unit_cost) VALUES (?, ?, ?, ?, ?)', [$orderId, $iid, (int)$l['qty'], $prices[$iid], $costs[$iid]]);
+            mysqli_execute_query($conn, 'INSERT INTO orderline (orderinfo_id, item_id, quantity, unit_price, unit_cost) VALUES (?, ?, ?, ?, ?)', [
+                $orderId, $iid, (int)$l['qty'], $orderItems[$iid]['price'], $orderItems[$iid]['cost'],
+            ]);
             mysqli_execute_query($conn, 'UPDATE stock SET quantity = quantity - ? WHERE item_id = ?', [(int)$l['qty'], $iid]);
         }
         mysqli_commit($conn);
-    } catch (RuntimeException $e) {
+    } catch (DomainException $e) {
         mysqli_rollback($conn);
         $_SESSION['message'] = $e->getMessage();
         header('Location: ' . BASE_URL . '/view_cart.php');
         exit();
-    } catch (Throwable $t) {
+    } catch (Throwable $e) {
         mysqli_rollback($conn);
         $_SESSION['message'] = 'Something went wrong placing your order. Nothing was charged or changed. Please try again.';
         header('Location: ' . BASE_URL . '/view_cart.php');
@@ -62,7 +71,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $emailType = 'placed';
     include('includes/order_email.php');
     $_SESSION['success'] = "Order #$orderId placed. Thank you! A confirmation was emailed to " . ($_SESSION['email'] ?? 'you') . '.';
-    header('Location: ' . BASE_URL . '/' . 'user/order_view.php?id=' . $orderId); exit();
+    header('Location: ' . BASE_URL . '/user/order_view.php?id=' . $orderId);
+    exit();
 }
 
 $pageTitle = 'Checkout';

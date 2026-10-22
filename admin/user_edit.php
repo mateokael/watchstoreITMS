@@ -8,7 +8,11 @@ $id = (int)($_GET['id'] ?? 0);
 $u = null;
 $c = null;
 if ($id) {
-    $u = mysqli_fetch_assoc(mysqli_execute_query($conn, "SELECT * FROM users WHERE user_id = ? AND user_id <> " . (int)$_SESSION['user_id'], [$id]));
+    $u = mysqli_fetch_assoc(mysqli_execute_query(
+        $conn,
+        'SELECT * FROM users WHERE user_id = ? AND user_id <> ?',
+        [$id, (int)$_SESSION['user_id']]
+    ));
     if (!$u) {
         $_SESSION['message'] = 'That account does not exist (edit your own account from My profile).';
         header('Location: ' . BASE_URL . '/admin/users.php');

@@ -21,7 +21,11 @@ foreach (['title', 'fname', 'lname', 'addressline', 'town', 'zipcode', 'phone'] 
 $_SESSION['old'] = array_merge(['role' => $role, 'status' => $status, 'username' => $username, 'email' => $email], $cust);
 $back = BASE_URL . '/admin/user_edit.php' . ($id ? '?id=' . $id : '');
 
-$existing = $id ? mysqli_fetch_assoc(mysqli_execute_query($conn, "SELECT user_id FROM users WHERE user_id = ? AND user_id <> " . (int)$_SESSION['user_id'], [$id])) : null;
+$existing = $id ? mysqli_fetch_assoc(mysqli_execute_query(
+    $conn,
+    'SELECT user_id FROM users WHERE user_id = ? AND user_id <> ?',
+    [$id, (int)$_SESSION['user_id']]
+)) : null;
 if ($id && !$existing) {
     $_SESSION['message'] = 'That account does not exist.';
     header('Location: ' . BASE_URL . '/admin/users.php');
@@ -51,7 +55,6 @@ if ($error) {
     exit();
 }
 
-global $conn;
 mysqli_begin_transaction($conn);
 try {
     if ($id) {

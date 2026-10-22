@@ -9,7 +9,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $id = (int)($_POST['user_id'] ?? 0);
-$u = mysqli_fetch_assoc(mysqli_execute_query($conn, "SELECT username, status FROM users WHERE user_id = ? AND user_id <> " . (int)$_SESSION['user_id'], [$id]));
+$u = mysqli_fetch_assoc(mysqli_execute_query(
+    $conn,
+    'SELECT username, status FROM users WHERE user_id = ? AND user_id <> ?',
+    [$id, (int)$_SESSION['user_id']]
+));
 if (!$u) {
     $_SESSION['message'] = 'That account does not exist.';
 } else {

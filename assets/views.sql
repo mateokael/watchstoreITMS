@@ -1,11 +1,10 @@
--- MySQL VIEWS for the order transaction details (Unit 1).
--- Run this on an existing database (phpMyAdmin > db_watchstoreproj > SQL). A fresh import of database.sql already has them.
+-- Run on an existing database; database.sql already creates these views on a fresh install.
 USE db_watchstoreproj;
 
 DROP VIEW IF EXISTS v_order_totals;
 DROP VIEW IF EXISTS v_order_details;
 
--- One row per order LINE: who bought, what, how many, at what price, and the line total.
+-- One row per order line.
 CREATE VIEW v_order_details AS
 SELECT o.orderinfo_id, o.date_placed, o.date_shipped, o.date_delivered, o.status, o.shipping, o.receipt_pref,
        c.customer_id, c.user_id, c.title, c.fname, c.lname, c.addressline, c.town, c.zipcode, c.phone,
@@ -19,7 +18,7 @@ INNER JOIN users     u  ON u.user_id      = c.user_id
 INNER JOIN orderline ol ON ol.orderinfo_id = o.orderinfo_id
 INNER JOIN item      i  ON i.item_id      = ol.item_id;
 
--- One row per ORDER: customer details + subtotal, shipping and grand total (built on the view above).
+-- One row per order with totals.
 CREATE VIEW v_order_totals AS
 SELECT d.orderinfo_id, d.date_placed, d.date_shipped, d.date_delivered, d.status, d.shipping, d.receipt_pref,
        d.customer_id, d.user_id, d.title, d.fname, d.lname, d.addressline, d.town, d.zipcode, d.phone,

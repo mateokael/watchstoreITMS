@@ -1,4 +1,4 @@
--- WatchStore database. Import in phpMyAdmin (Import tab) or: mysql -u root < database.sql
+-- WatchStore schema and sample data.
 CREATE DATABASE IF NOT EXISTS db_watchstoreproj CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE db_watchstoreproj;
 
@@ -9,16 +9,16 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE users (
   user_id    INT AUTO_INCREMENT PRIMARY KEY,
-  username   VARCHAR(30) NOT NULL UNIQUE,          -- unique, and "Sam" = "sam" (case-insensitive collation)
+  username   VARCHAR(30) NOT NULL UNIQUE,
   email      VARCHAR(100) NOT NULL UNIQUE,
   password   VARCHAR(255) NOT NULL,
-  profile_pic VARCHAR(255) NULL,                   -- e.g. images/avatars/user_ab12.jpg
-  role       ENUM('user','employee','admin') NOT NULL DEFAULT 'user',   -- employee: restock + confirm orders only
+  profile_pic VARCHAR(255) NULL,
+  role       ENUM('user','employee','admin') NOT NULL DEFAULT 'user',
   status     ENUM('active','inactive') NOT NULL DEFAULT 'active',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- one row per "forgot password" request. Only a hash of the emailed token is stored.
+-- Password reset tokens are stored as hashes.
 CREATE TABLE password_resets (
   id         INT AUTO_INCREMENT PRIMARY KEY,
   user_id    INT NOT NULL,
@@ -53,8 +53,8 @@ CREATE TABLE item (
   water_resistance VARCHAR(20) NULL,
   cost_price       DECIMAL(10,2) NOT NULL,
   sell_price       DECIMAL(10,2) NOT NULL,
-  img_path         VARCHAR(255) NULL,       -- e.g. images/products/watch_ab12.jpg
-  -- is_active = 0 means ARCHIVED (hidden from the shop, kept for old orders)
+  img_path         VARCHAR(255) NULL,
+  -- Inactive items are archived but retained for order history.
   is_active        TINYINT(1) NOT NULL DEFAULT 1,
   created_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
@@ -78,10 +78,10 @@ CREATE TABLE orderinfo (
   customer_id  INT NOT NULL,
   date_placed  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   date_shipped DATETIME NULL,
-  date_delivered DATETIME NULL,          -- set when status becomes delivered (this is when the sale counts as income)
+  date_delivered DATETIME NULL,
   shipping     DECIMAL(8,2) NOT NULL DEFAULT 0,
   status       ENUM('pending','shipped','delivered','cancelled') NOT NULL DEFAULT 'pending',
-  receipt_pref ENUM('email','print') NOT NULL DEFAULT 'email',   -- how the customer wants the receipt
+  receipt_pref ENUM('email','print') NOT NULL DEFAULT 'email',
   FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
 ) ENGINE=InnoDB;
 
@@ -89,20 +89,19 @@ CREATE TABLE orderline (
   orderinfo_id INT NOT NULL,
   item_id      INT NOT NULL,
   quantity     INT NOT NULL,
-  unit_price   DECIMAL(10,2) NOT NULL,   -- price at the time of purchase
-  unit_cost    DECIMAL(10,2) NOT NULL DEFAULT 0,   -- cost at the time of purchase (so profit stays correct if the cost changes later)
+  unit_price   DECIMAL(10,2) NOT NULL,
+  unit_cost    DECIMAL(10,2) NOT NULL DEFAULT 0,
   PRIMARY KEY (orderinfo_id, item_id),
   FOREIGN KEY (orderinfo_id) REFERENCES orderinfo(orderinfo_id) ON DELETE CASCADE,
   FOREIGN KEY (item_id) REFERENCES item(item_id)
 ) ENGINE=InnoDB;
 
--- One receipt per completed (delivered) order. The customer picks email or print at checkout (receipt_pref);
--- staff can email it, resend it, or print it for the customer in person. Totals are not stored: they come from the order lines.
+-- One receipt per delivered order; totals are calculated from its order lines.
 CREATE TABLE receipt (
   receipt_id   INT AUTO_INCREMENT PRIMARY KEY,
   orderinfo_id INT NOT NULL UNIQUE,
-  method       ENUM('email','print') NOT NULL DEFAULT 'email',   -- how it was (last) given to the customer
-  issued_by    INT NULL,                                          -- the staff member who completed the order
+  method       ENUM('email','print') NOT NULL DEFAULT 'email',
+  issued_by    INT NULL,
   issued_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   emailed_at   DATETIME NULL,
   printed_at   DATETIME NULL,
@@ -131,7 +130,7 @@ CREATE TABLE wishlist (
 ) ENGINE=InnoDB;
 
 
--- Expenses (rent, salaries, supplies...). Category lives in its own table so the category name is stored once (3NF).
+-- Expense categories are stored separately to avoid repeated names.
 CREATE TABLE expense_category (
   category_id INT AUTO_INCREMENT PRIMARY KEY,
   name        VARCHAR(50) NOT NULL UNIQUE
@@ -143,7 +142,7 @@ CREATE TABLE expense (
   description  VARCHAR(200) NOT NULL,
   amount       DECIMAL(10,2) NOT NULL,
   expense_date DATE NOT NULL,
-  created_by   INT NULL,                 -- the admin who recorded it
+  created_by   INT NULL,
   created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (category_id) REFERENCES expense_category(category_id),
   FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
@@ -152,11 +151,11 @@ CREATE TABLE expense (
 INSERT INTO expense_category (name) VALUES
 ('Rent'), ('Salaries'), ('Utilities'), ('Supplies & packaging'), ('Marketing'), ('Delivery / courier'), ('Repairs & maintenance'), ('Other');
 
--- Seed admin: admin@watchstore.test / admin123  (change after first login)
+-- Demo admin: admin@watchstore.test / admin123.
 INSERT INTO users (username, email, password, role) VALUES
 ('admin', 'admin@watchstore.test', '$2b$10$VTVlL6VAnslIDuxqKqtK3OQd/K3kMzIEv3V3V2nrDIQIxYcg5gJTG', 'admin');
 
--- Sample watches (no images: the placeholder shows until you upload some)
+-- Sample watches.
 INSERT INTO item (brand, model, description, movement, category, case_size_mm, strap_type, water_resistance, cost_price, sell_price) VALUES
 ('Casio',   'F-91W',            'Digital classic with alarm, stopwatch and daily chime.',            'quartz',    'unisex', 35, 'Resin',           '30 m',   550.00,  995.00),
 ('Seiko',   '5 Sports SRPD',    'Automatic diver-style daily wear with day-date display.',          'automatic', 'men',    42, 'Stainless steel', '100 m', 9500.00, 14500.00),
@@ -169,10 +168,7 @@ INSERT INTO stock (item_id, quantity, low_stock_level) VALUES
 (1, 25, 5), (2, 8, 3), (3, 6, 3), (4, 4, 3), (5, 15, 5), (6, 2, 3);
 
 
--- ===== MySQL VIEWS for the order transaction details =====
-
-
--- One row per order LINE: who bought, what, how many, at what price, and the line total.
+-- Order views provide line details and order totals.
 CREATE VIEW v_order_details AS
 SELECT o.orderinfo_id, o.date_placed, o.date_shipped, o.date_delivered, o.status, o.shipping, o.receipt_pref,
        c.customer_id, c.user_id, c.title, c.fname, c.lname, c.addressline, c.town, c.zipcode, c.phone,
@@ -186,7 +182,6 @@ INNER JOIN users     u  ON u.user_id      = c.user_id
 INNER JOIN orderline ol ON ol.orderinfo_id = o.orderinfo_id
 INNER JOIN item      i  ON i.item_id      = ol.item_id;
 
--- One row per ORDER: customer details + subtotal, shipping and grand total (built on the view above).
 CREATE VIEW v_order_totals AS
 SELECT d.orderinfo_id, d.date_placed, d.date_shipped, d.date_delivered, d.status, d.shipping, d.receipt_pref,
        d.customer_id, d.user_id, d.title, d.fname, d.lname, d.addressline, d.town, d.zipcode, d.phone,

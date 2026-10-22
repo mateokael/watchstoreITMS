@@ -18,7 +18,7 @@ if ($q !== '') {
     $params[] = "%$q%";
 }
 
-// One row per order straight from the MySQL VIEW v_order_totals (customer + subtotal + shipping + grand total already worked out)
+// The order totals view returns one row per order.
 $orders = mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT o.*, o.grand_total AS total FROM v_order_totals o'
     . ($where ? ' WHERE ' . implode(' AND ', $where) : '')
     . ' ORDER BY o.orderinfo_id DESC', $params), MYSQLI_ASSOC);

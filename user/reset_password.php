@@ -33,7 +33,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         header('Location: ' . BASE_URL . '/user/login.php');
         exit();
     }
-    header('Location: ' . BASE_URL . '/' . 'user/reset_password.php?token=' . $token);
+    header('Location: ' . BASE_URL . '/user/reset_password.php?token=' . $token);
     exit();
 }
 

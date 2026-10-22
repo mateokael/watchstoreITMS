@@ -1,5 +1,5 @@
 <?php
-// The session cart is only [item_id => qty]. This reads the names and prices from the database and
+// Load current product details and stock for the session cart.
 $lines = [];
 $cartNow = $_SESSION['cart'] ?? [];
 if ($cartNow) {

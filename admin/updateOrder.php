@@ -11,7 +11,7 @@ $id  = (int)($_POST['order_id'] ?? 0);        // comes from the form, not the se
 $new = (string)($_POST['status'] ?? '');
 if ($new === 'cancelled' && !(($_SESSION['role'] ?? '') === 'admin')) {
     $_SESSION['message'] = 'Only the store admin can cancel an order.';
-    header('Location: ' . BASE_URL . '/' . 'admin/orderDetails.php?id=' . $id);
+    header('Location: ' . BASE_URL . '/admin/orderDetails.php?id=' . $id);
     exit();
 }
 $statusOrderId = $id;
@@ -23,5 +23,5 @@ if ($err) {
 } else {
     $_SESSION['success'] = "Order #$id is now $new.";
 }
-header('Location: ' . BASE_URL . '/' . 'admin/orderDetails.php?id=' . $id);
+header('Location: ' . BASE_URL . '/admin/orderDetails.php?id=' . $id);
 exit();

@@ -25,7 +25,7 @@ include('../includes/receipt_issue.php');
 
 if ($action === 'print') {
     mysqli_execute_query($conn, "UPDATE receipt SET method = 'print', printed_at = NOW() WHERE orderinfo_id = ?", [$id]);
-    header('Location: ' . BASE_URL . '/' . 'user/receipt.php?id=' . $id . '&autoprint=1');
+    header('Location: ' . BASE_URL . '/user/receipt.php?id=' . $id . '&autoprint=1');
     exit();
 }
 include('../includes/receipt_send.php');

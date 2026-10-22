@@ -18,13 +18,12 @@ if (!in_array($statusNew, ORDER_STATUSES, true)) {
                 mysqli_execute_query($conn, 'UPDATE stock s JOIN orderline ol ON ol.item_id = s.item_id
                                              SET s.quantity = s.quantity + ol.quantity WHERE ol.orderinfo_id = ?', [$statusOrderId]);
             }
-            if ($statusNew === 'shipped') {
-                mysqli_execute_query($conn, 'UPDATE orderinfo SET status = ?, date_shipped = NOW() WHERE orderinfo_id = ?', [$statusNew, $statusOrderId]);
-            } elseif ($statusNew === 'delivered') {
-                mysqli_execute_query($conn, 'UPDATE orderinfo SET status = ?, date_delivered = NOW() WHERE orderinfo_id = ?', [$statusNew, $statusOrderId]);
-            } else {
-                mysqli_execute_query($conn, 'UPDATE orderinfo SET status = ? WHERE orderinfo_id = ?', [$statusNew, $statusOrderId]);
+            $statusDate = ['shipped' => 'date_shipped', 'delivered' => 'date_delivered'][$statusNew] ?? null;
+            $statusSql = 'UPDATE orderinfo SET status = ?';
+            if ($statusDate) {
+                $statusSql .= ", $statusDate = NOW()";
             }
+            mysqli_execute_query($conn, $statusSql . ' WHERE orderinfo_id = ?', [$statusNew, $statusOrderId]);
             mysqli_commit($conn);
         }
     } catch (Throwable $stError) {
