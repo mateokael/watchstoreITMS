@@ -4,13 +4,15 @@ session_start();
 include('../includes/config.php');
 include('../includes/guard_admin.php');
 
-$sales = mysqli_fetch_assoc(mysqli_execute_query($conn, "SELECT COALESCE(SUM(ol.unit_price * ol.quantity), 0) AS revenue,
-                        COALESCE(SUM((ol.unit_price - i.cost_price) * ol.quantity), 0) AS profit,
-                        COALESCE(SUM(ol.quantity), 0) AS units
-                 FROM orderline ol
-                 JOIN orderinfo o ON o.orderinfo_id = ol.orderinfo_id
-                 JOIN item i ON i.item_id = ol.item_id
-                 WHERE o.status <> 'cancelled'"));
+$sales = mysqli_fetch_assoc(mysqli_execute_query($conn, "SELECT SUM(d.unit_price * d.quantity) AS revenue,
+                        SUM((d.unit_price - d.unit_cost) * d.quantity) AS profit,
+                        SUM(d.quantity) AS units
+                 FROM v_order_details d
+                 WHERE d.status <> 'cancelled'"));
+
+$sales['revenue'] = (float)($sales['revenue'] ?? 0);
+$sales['profit'] = (float)($sales['profit'] ?? 0);
+$sales['units'] = (int)($sales['units'] ?? 0);
 
 $byStatus = [];
 foreach (mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT status, COUNT(*) AS n FROM orderinfo GROUP BY status'), MYSQLI_ASSOC) as $r) {
@@ -18,29 +20,31 @@ foreach (mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT status, COUNT(*) A
 }
 $customers = (int)(mysqli_fetch_row(mysqli_execute_query($conn, "SELECT COUNT(*) FROM users WHERE role = 'user'")) ?? [null])[0];
 
-$top = mysqli_fetch_all(mysqli_execute_query($conn, "SELECT i.item_id, i.brand, i.model, SUM(ol.quantity) AS units, SUM(ol.unit_price * ol.quantity) AS revenue
-               FROM orderline ol
-               JOIN orderinfo o ON o.orderinfo_id = ol.orderinfo_id
-               JOIN item i ON i.item_id = ol.item_id
-               WHERE o.status <> 'cancelled'
-               GROUP BY i.item_id, i.brand, i.model ORDER BY units DESC, revenue DESC LIMIT 5"), MYSQLI_ASSOC);
+$top = mysqli_fetch_all(mysqli_execute_query($conn, "SELECT item_id, brand, model, SUM(quantity) AS units, SUM(unit_price * quantity) AS revenue
+               FROM v_order_details
+               WHERE status <> 'cancelled'
+               GROUP BY item_id, brand, model ORDER BY units DESC, revenue DESC LIMIT 5"), MYSQLI_ASSOC);
 
-$monthly = mysqli_fetch_all(mysqli_execute_query($conn, "SELECT DATE_FORMAT(o.date_placed, '%Y-%m') AS ym, COUNT(DISTINCT o.orderinfo_id) AS orders,
-                          SUM(ol.unit_price * ol.quantity) AS sales
-                   FROM orderinfo o JOIN orderline ol ON ol.orderinfo_id = o.orderinfo_id
-                   WHERE o.status <> 'cancelled'
-                   GROUP BY DATE_FORMAT(o.date_placed, '%Y-%m') ORDER BY ym DESC LIMIT 6"), MYSQLI_ASSOC);
+$monthly = mysqli_fetch_all(mysqli_execute_query($conn, "SELECT DATE_FORMAT(date_placed, '%Y-%m') AS ym, COUNT(DISTINCT orderinfo_id) AS orders,
+                          SUM(unit_price * quantity) AS sales
+                   FROM v_order_details
+                   WHERE status <> 'cancelled'
+                   GROUP BY DATE_FORMAT(date_placed, '%Y-%m') ORDER BY ym DESC LIMIT 6"), MYSQLI_ASSOC);
 
 $low = mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT i.item_id, i.brand, i.model, s.quantity, s.low_stock_level
                FROM item i JOIN stock s ON s.item_id = i.item_id
                WHERE i.is_active = 1 AND s.quantity <= s.low_stock_level ORDER BY s.quantity ASC, i.brand'), MYSQLI_ASSOC);
 
-$recent = mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT o.orderinfo_id, o.date_placed, o.status, c.fname, c.lname,
-                         COALESCE(SUM(ol.unit_price * ol.quantity), 0) + o.shipping AS total
-                  FROM orderinfo o
-                  JOIN customer c ON c.customer_id = o.customer_id
-                  LEFT JOIN orderline ol ON ol.orderinfo_id = o.orderinfo_id
-                  GROUP BY o.orderinfo_id ORDER BY o.orderinfo_id DESC LIMIT 5'), MYSQLI_ASSOC);
+$recent = mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT orderinfo_id, MAX(date_placed) AS date_placed, MAX(status) AS status,
+                         MAX(fname) AS fname, MAX(lname) AS lname,
+                         SUM(unit_price * quantity) + MAX(shipping) AS total
+                  FROM v_order_details
+                  GROUP BY orderinfo_id ORDER BY orderinfo_id DESC LIMIT 5'), MYSQLI_ASSOC);
+
+foreach ($recent as &$row) {
+    $row['total'] = (float)($row['total'] ?? 0);
+}
+unset($row);
 
 $pageTitle = 'Dashboard';
 $containerClass = 'container-fluid px-3 px-lg-5 admin-open-page admin-dashboard';

@@ -1,6 +1,7 @@
 <?php
 // One simple look for every email (inline styles, because mail apps ignore stylesheets).
 $layoutUrl = $layoutUrl ?? null;
+$layoutFooter = $layoutFooter ?? 'You are getting this email because of activity on your WatchStore account.';
 $layoutButton = '';
 if ($layoutUrl) {
     $layoutButton = '<p style="margin:24px 0 8px"><a href="' . htmlspecialchars($layoutUrl) . '" style="background:#000000;color:#ffffff;text-decoration:none;'
@@ -14,6 +15,7 @@ $mailBody = '<!doctype html><html><body style="margin:0;background:#ffffff;font-
     . '<h1 style="font-family:Georgia,serif;font-weight:normal;font-size:24px;margin:0 0 14px">' . htmlspecialchars($layoutHeading) . '</h1>'
     . $layoutInner . $layoutButton
     . '</td></tr>'
-    . '<tr><td style="padding:14px 24px;font-size:12px;color:#6b6b6b;border-top:1px solid #e5e5e5">You are getting this email because of activity on your WatchStore account.</td></tr>'
+    . '<tr><td style="padding:14px 24px;font-size:12px;color:#6b6b6b;border-top:1px solid #e5e5e5">' . htmlspecialchars($layoutFooter) . '</td></tr>'
     . '</table></td></tr></table></body></html>';
 $layoutUrl = null;
+$layoutFooter = null;

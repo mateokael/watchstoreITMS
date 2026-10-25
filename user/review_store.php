@@ -1,5 +1,5 @@
 <?php
-// Save reviews only for delivered purchases and reject foul language.
+// Save reviews only for delivered purchases and mask foul language.
 session_start();
 include('../includes/config.php');
 include('../includes/guard_login.php');
@@ -28,12 +28,12 @@ if (!$bought) {
 } else {
     $badText = $text;
     include('../includes/badwords.php');
+    $text = $badMaskedText;
+    mysqli_execute_query($conn, 'INSERT INTO review (item_id, user_id, rating, comment, created_at) VALUES (?, ?, ?, ?, NOW())
+            ON DUPLICATE KEY UPDATE rating = VALUES(rating), comment = VALUES(comment), created_at = NOW()', [$id, $uid, $rating, $text === '' ? null : $text]);
     if ($badFound) {
-        $_SESSION['old'] = ['comment' => $text, 'rating' => $rating];
-        $_SESSION['message'] = $badMessage;
+        $_SESSION['warning'] = $badMessage;
     } else {
-        mysqli_execute_query($conn, 'INSERT INTO review (item_id, user_id, rating, comment, created_at) VALUES (?, ?, ?, ?, NOW())
-                ON DUPLICATE KEY UPDATE rating = VALUES(rating), comment = VALUES(comment), created_at = NOW()', [$id, $uid, $rating, $text === '' ? null : $text]);
         $_SESSION['success'] = 'Thanks, your review is saved.';
     }
 }

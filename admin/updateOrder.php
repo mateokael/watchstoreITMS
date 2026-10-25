@@ -20,8 +20,10 @@ include('../includes/change_status.php');
 $err = $statusError;
 if ($err) {
     $_SESSION['message'] = $err;
+} elseif (!$mailSent) {
+    $_SESSION['warning'] = "Order #$id is now $new, but its notification email with the transaction PDF could not be sent. Check logs/mail-error.log.";
 } else {
-    $_SESSION['success'] = "Order #$id is now $new.";
+    $_SESSION['success'] = "Order #$id is now $new. The notification email with its transaction PDF was sent.";
 }
 header('Location: ' . BASE_URL . '/admin/orderDetails.php?id=' . $id);
 exit();

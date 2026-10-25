@@ -70,7 +70,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $emailOrderId = $orderId;
     $emailType = 'placed';
     include('includes/order_email.php');
-    $_SESSION['success'] = "Order #$orderId placed. Thank you! A confirmation was emailed to " . ($_SESSION['email'] ?? 'you') . '.';
+    if ($mailSent) {
+        $_SESSION['success'] = "Order #$orderId placed. Thank you! A confirmation with your transaction PDF was emailed to " . ($_SESSION['email'] ?? 'you') . '.';
+    } else {
+        $_SESSION['warning'] = "Order #$orderId was placed, but the confirmation email with its PDF could not be sent. Please contact the store or check the mail error log.";
+    }
     header('Location: ' . BASE_URL . '/user/order_view.php?id=' . $orderId);
     exit();
 }

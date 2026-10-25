@@ -1,6 +1,6 @@
 <?php
 
-// 'smtp' = send through Mailtrap.    (offline testing)
+// 'smtp' = send through Mailtrap.    
 define('MAIL_MODE', 'smtp');
 
 define('MAIL_HOST', 'sandbox.smtp.mailtrap.io');   // older inboxes: smtp.mailtrap.io

@@ -5,7 +5,7 @@ Plain PHP + MySQLi + Bootstrap 5 (includes, one page per job, session cart).
 ## Setup (XAMPP)
 1. Put the project folder in `htdocs`. **Any folder name works**: the base URL is detected automatically (see "Images and GitHub").
 2. Start Apache and MySQL, open phpMyAdmin, **Import** `database.sql` (it creates `db_watchstoreproj`).
-   - Already have the old database with data? Run `migration.sql` instead (once). It adds usernames, profile pictures and the password-reset table without deleting anything.
+   - Already have an older database with data? Run `assets/migration.sql` first if its schema is missing the current columns, then run `assets/views.sql` to install the current order-detail view without deleting data.
 3. Open `http://localhost/<your-folder>/`
 4. Admin login: `admin@watchstore.test` / `admin123`. Change it from **My profile**.
 5. Settings (currency, shipping fee, DB login) are at the top of `includes/config.php`.
@@ -20,12 +20,12 @@ Plain PHP + MySQLi + Bootstrap 5 (includes, one page per job, session cart).
 | MP4 verified-purchase reviews, detail-page display/update and foul-word filtering | Delivered customers can create or update one review per product; `product.php`, `user/review_store.php`, `includes/badwords.php` |
 | MP5 PHP-only login and product-form validation | `user/login.php` and shared `includes/item_validate.php`; the forms disable browser validation |
 | Term test: completed orders, admin status updates, customer email and PDF receipt | `checkout.php`, `admin/orders.php`, `admin/updateOrder.php`, `includes/order_email.php`, `includes/receipt_pdf.php`; SQL uses `mysqli_execute_query()` |
-| Unit 1: normalized schema and order-detail views | Tables and relationships in `database.sql`; `v_order_details` and `v_order_totals` power order details and totals |
+| Unit 1: normalized schema and order-detail view | Tables and relationships in `database.sql`; `v_order_details` provides raw order-line data and PHP calculates totals |
 | Unit 2: execution and interface | XAMPP setup and guided flows in this README; responsive storefront and admin pages use Bootstrap |
 | Quiz 3: homepage search | Search from `index.php` submits to the shop's prepared, parameterized product search in `shop.php` |
 
 ## Version 3: employees, expenses, reports (class requirements)
-**Already have the database imported?** Run `migration.sql` once (the new part is at the bottom, "Version 3"). New setup: import `database.sql`, then optionally `sample_data.sql` for demo orders, expenses and accounts (password for all demo accounts: `admin123`).
+**Already have the database imported?** Run `assets/migration.sql` once (the new part is at the bottom, "Version 3"), then `assets/views.sql` if you need to refresh the order-details view. For a new setup, import `database.sql`. This project does not include a separate demo-data SQL file.
 
 | Requirement | Where (log in as admin) |
 |---|---|
@@ -62,7 +62,7 @@ Out of the box email is in **log mode**: nothing is sent, each email is written 
 
 To send email through the required Mailtrap service:
 1. Copy `includes/mail_config.sample.php` to `includes/mail_config.php`.
-2. Set the `MAILTRAP_USER` and `MAILTRAP_PASS` environment variables to the credentials for your Mailtrap Email Testing inbox before starting Apache. SMTP mode is enabled when both are set; otherwise emails stay in log mode.
+2. Replace the sample username and password with the credentials for your Mailtrap Email Testing inbox, then set `MAIL_MODE` to `smtp`.
 3. `mail_config.php` is in `.gitignore`, so credentials are not pushed to GitHub. Never commit Mailtrap credentials.
 
 PHPMailer is bundled in `includes/PHPMailer/`, so there is nothing to install with Composer. If an email fails to send, the order or account action still goes through and the reason is written to `logs/mail-error.log`.

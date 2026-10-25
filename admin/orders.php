@@ -8,20 +8,31 @@ $q      = trim($_GET['q'] ?? '');
 $where = [];
 $params = [];
 if (in_array($status, ORDER_STATUSES, true)) {
-    $where[] = 'o.status = ?';
+    $where[] = 'd.status = ?';
     $params[] = $status;
 }
 if ($q !== '') {
-    $where[] = '(o.orderinfo_id = ? OR o.fname LIKE ? OR o.lname LIKE ?)';
+    $where[] = '(d.orderinfo_id = ? OR d.fname LIKE ? OR d.lname LIKE ?)';
     $params[] = (int)ltrim($q, '#');
     $params[] = "%$q%";
     $params[] = "%$q%";
 }
 
-// The order totals view returns one row per order.
-$orders = mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT o.*, o.grand_total AS total FROM v_order_totals o'
+$rows = mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT orderinfo_id, date_placed, status, shipping, fname, lname, quantity, unit_price
+    FROM v_order_details d'
     . ($where ? ' WHERE ' . implode(' AND ', $where) : '')
-    . ' ORDER BY o.orderinfo_id DESC', $params), MYSQLI_ASSOC);
+    . ' ORDER BY orderinfo_id DESC', $params), MYSQLI_ASSOC);
+
+$orders = [];
+foreach ($rows as $row) {
+    $id = $row['orderinfo_id'];
+    if (!isset($orders[$id])) {
+        $orders[$id] = $row;
+        $orders[$id]['total'] = (float)$row['shipping'];
+    }
+    $orders[$id]['total'] += (int)$row['quantity'] * (float)$row['unit_price'];
+}
+$orders = array_values($orders);
 
 $pageTitle = 'Orders';
 include('../includes/header.php');

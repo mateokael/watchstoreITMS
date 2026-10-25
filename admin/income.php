@@ -15,13 +15,18 @@ $monthly = $days > 62;
 $fmt     = $monthly ? '%Y-%m' : '%Y-%m-%d';
 
 $sales = [];
-foreach (mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT DATE_FORMAT(' . SALE_DATE_SQL . ', \'' . $fmt . '\') AS b, SUM(ol.unit_price * ol.quantity) AS v
-                 FROM orderinfo o INNER JOIN orderline ol ON ol.orderinfo_id = o.orderinfo_id
-                 WHERE o.status = \'delivered\' AND ' . SALE_DATE_SQL . ' BETWEEN ? AND ? GROUP BY b', [$from, $to]), MYSQLI_ASSOC) as $r) {
+foreach (mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT DATE_FORMAT(DATE(date_delivered), \'' . $fmt . '\') AS b, SUM(quantity * unit_price) AS v
+                 FROM v_order_details
+                 WHERE status = \'delivered\' AND DATE(date_delivered) BETWEEN ? AND ? GROUP BY b', [$from, $to]), MYSQLI_ASSOC) as $r) {
     $sales[$r['b']] = (float)$r['v'];
 }
-foreach (mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT DATE_FORMAT(' . SALE_DATE_SQL . ', \'' . $fmt . '\') AS b, SUM(o.shipping) AS v
-                 FROM orderinfo o WHERE o.status = \'delivered\' AND ' . SALE_DATE_SQL . ' BETWEEN ? AND ? GROUP BY b', [$from, $to]), MYSQLI_ASSOC) as $r) {
+foreach (mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT DATE_FORMAT(DATE(date_delivered), \'' . $fmt . '\') AS b, SUM(shipping) AS v
+                 FROM (
+                     SELECT orderinfo_id, date_delivered, MAX(shipping) AS shipping
+                     FROM v_order_details
+                     WHERE status = \'delivered\' AND DATE(date_delivered) BETWEEN ? AND ?
+                     GROUP BY orderinfo_id, date_delivered
+                 ) AS delivered_orders GROUP BY b', [$from, $to]), MYSQLI_ASSOC) as $r) {
     $sales[$r['b']] = ($sales[$r['b']] ?? 0) + (float)$r['v'];
 }
 $exp = [];
@@ -42,14 +47,12 @@ while ($cur <= $end) {
     $cur->modify($monthly ? '+1 month' : '+1 day');
 }
 
-$orders = mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT o.orderinfo_id, ' . SALE_DATE_SQL . ' AS sale_date, c.fname, c.lname,
-                         SUM(ol.quantity) AS pieces, SUM(ol.unit_price * ol.quantity) AS items, o.shipping
-                  FROM orderinfo o
-                  INNER JOIN customer c ON c.customer_id = o.customer_id
-                  INNER JOIN orderline ol ON ol.orderinfo_id = o.orderinfo_id
-                  WHERE o.status = \'delivered\' AND ' . SALE_DATE_SQL . ' BETWEEN ? AND ?
-                  GROUP BY o.orderinfo_id, sale_date, c.fname, c.lname, o.shipping
-                  ORDER BY sale_date DESC, o.orderinfo_id DESC', [$from, $to]), MYSQLI_ASSOC);
+$orders = mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT orderinfo_id, DATE(date_delivered) AS sale_date, fname, lname,
+                         SUM(quantity) AS pieces, SUM(quantity * unit_price) AS items, MAX(shipping) AS shipping
+                  FROM v_order_details
+                  WHERE status = \'delivered\' AND DATE(date_delivered) BETWEEN ? AND ?
+                  GROUP BY orderinfo_id, DATE(date_delivered), fname, lname
+                  ORDER BY sale_date DESC, orderinfo_id DESC', [$from, $to]), MYSQLI_ASSOC);
 
 $today = date('Y-m-d');
 $quick = [

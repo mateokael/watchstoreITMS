@@ -63,7 +63,8 @@ try {
             mysqli_execute_query($conn, 'UPDATE users SET password = ? WHERE user_id = ?', [password_hash($pass, PASSWORD_BCRYPT), $id]);
         }
     } else {
-        $id = (int)mysqli_execute_query($conn, 'INSERT INTO users (username, email, password, role, status, created_at) VALUES (?, ?, ?, ?, ?, NOW())', [$username, $email, password_hash($pass, PASSWORD_BCRYPT), $role, $status])->insert_id;
+        mysqli_execute_query($conn, 'INSERT INTO users (username, email, password, role, status, created_at) VALUES (?, ?, ?, ?, ?, NOW())', [$username, $email, password_hash($pass, PASSWORD_BCRYPT), $role, $status]);
+        $id = (int)mysqli_insert_id($conn);
     }
     if ($wantsCustomer) {
         if (mysqli_fetch_row(mysqli_execute_query($conn, 'SELECT 1 FROM customer WHERE user_id = ?', [$id]))) {

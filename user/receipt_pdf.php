@@ -5,7 +5,7 @@ include('../includes/config.php');
 include('../includes/guard_login.php');
 
 $id = (int)($_GET['id'] ?? 0);
-$o  = mysqli_fetch_assoc(mysqli_execute_query($conn, 'SELECT user_id FROM v_order_totals WHERE orderinfo_id = ?', [$id]));
+$o  = mysqli_fetch_assoc(mysqli_execute_query($conn, 'SELECT user_id FROM v_order_details WHERE orderinfo_id = ? LIMIT 1', [$id]));
 if (!$o || ((int)$o['user_id'] !== (int)$_SESSION['user_id'] && !in_array($_SESSION['role'] ?? '', ['admin', 'employee']))) {
     http_response_code(404);
     $_SESSION['warning'] = 'That receipt could not be found.';

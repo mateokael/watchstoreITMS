@@ -1,5 +1,5 @@
 <?php
-// Changes the status of an order. Used by the admin status form AND by the customer's "Cancel order" button.
+// Changes the status of an order.
 $statusError = null;
 if (!in_array($statusNew, ORDER_STATUSES, true)) {
     $statusError = 'Unknown status.';
@@ -15,13 +15,16 @@ if (!in_array($statusNew, ORDER_STATUSES, true)) {
             $statusError = "A {$stOrder['status']} order can't be changed to $statusNew.";
         } else {
             if ($statusNew === 'cancelled') {
-                mysqli_execute_query($conn, 'UPDATE stock s JOIN orderline ol ON ol.item_id = s.item_id
-                                             SET s.quantity = s.quantity + ol.quantity WHERE ol.orderinfo_id = ?', [$statusOrderId]);
+                mysqli_execute_query($conn, 'UPDATE stock s
+                    JOIN orderline ol ON ol.item_id = s.item_id
+                    SET s.quantity = s.quantity + ol.quantity
+                    WHERE ol.orderinfo_id = ?', [$statusOrderId]);
             }
-            $statusDate = ['shipped' => 'date_shipped', 'delivered' => 'date_delivered'][$statusNew] ?? null;
+
+            $statusMap = ['shipped' => 'date_shipped', 'delivered' => 'date_delivered'];
             $statusSql = 'UPDATE orderinfo SET status = ?';
-            if ($statusDate) {
-                $statusSql .= ", $statusDate = NOW()";
+            if (isset($statusMap[$statusNew])) {
+                $statusSql .= ', ' . $statusMap[$statusNew] . ' = NOW()';
             }
             mysqli_execute_query($conn, $statusSql . ' WHERE orderinfo_id = ?', [$statusNew, $statusOrderId]);
             mysqli_commit($conn);
@@ -38,7 +41,8 @@ if (!in_array($statusNew, ORDER_STATUSES, true)) {
                 $receiptMethod = null;
                 $receiptDeliver = false;
                 include(ROOT_DIR . '/includes/receipt_issue.php');
-            } catch (Throwable $stReceiptError) {  }
+            } catch (Throwable $stReceiptError) {
+            }
         }
         $emailOrderId = $statusOrderId;
         $emailType = $statusNew;

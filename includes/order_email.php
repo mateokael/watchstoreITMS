@@ -21,14 +21,12 @@ try {
 
         $emLink = APP_URL . '/user/order_view.php?id=' . $emailOrderId;
         $emHi = '<p>Hi ' . htmlspecialchars($ord['fname']) . ',</p>';
-        $emPdf = true;
         $emSubject = '';
         if ($emailType === 'placed') {
             $emSubject = "Order #$emailOrderId confirmed";
             $emInner = $emHi . '<p>Thank you! We received your order <strong>#' . $emailOrderId . '</strong> and will get it ready.</p>' . $emTable . $emAddress
                 . '<p style="margin-top:14px">Payment is collected on delivery. We will email you again when it ships.</p>';
             $emButton = 'View your order';
-            $emPdf = false;
         } elseif ($emailType === 'shipped') {
             $emSubject = "Order #$emailOrderId is on its way";
             $emInner = $emHi . '<p>Good news: your order <strong>#' . $emailOrderId . '</strong> has shipped. Please keep your phone nearby and have the payment ready, because it is collected on delivery.</p>' . $emTable . $emAddress;
@@ -55,9 +53,13 @@ try {
         }
 
         if ($emSubject !== '') {
-            if ($emPdf) {
-                $emInner .= '<p style="font-size:13px;color:#6b6b6b">Your receipt is attached as a PDF.</p>';
+            $pdfOrderId = $emailOrderId;
+            include(ROOT_DIR . '/includes/receipt_pdf.php');
+            if ($pdfBytes === null || $pdfBytes === '') {
+                throw new RuntimeException("PDF attachment could not be generated for order #$emailOrderId.");
             }
+            $mailAttachments = [['name' => $pdfName, 'data' => $pdfBytes]];
+            $emInner .= '<p style="font-size:13px;color:#6b6b6b">Your transaction details are attached as a PDF.</p>';
             $layoutHeading = $emSubject;
             $layoutInner = $emInner;
             $layoutUrl = $emLink;
@@ -66,14 +68,6 @@ try {
 
             $mailTo = $ord['email'];
             $mailSubject = $emSubject;
-            $mailAttachments = [];
-            if ($emPdf) {
-                $pdfOrderId = $emailOrderId;
-                include(ROOT_DIR . '/includes/receipt_pdf.php');
-                if ($pdfBytes !== null) {
-                    $mailAttachments = [['name' => $pdfName, 'data' => $pdfBytes]];
-                }
-            }
             include(ROOT_DIR . '/includes/mail_send.php');
 
             if ($emailType === 'placed' && ADMIN_EMAIL !== '') {
@@ -85,6 +79,7 @@ try {
                 $emSent = $mailSent;
                 $mailTo = ADMIN_EMAIL;
                 $mailSubject = "New order #$emailOrderId";
+                $mailAttachments = [['name' => $pdfName, 'data' => $pdfBytes]];
                 include(ROOT_DIR . '/includes/mail_send.php');
                 $mailSent = $emSent;
             }

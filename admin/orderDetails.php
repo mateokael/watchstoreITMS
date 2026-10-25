@@ -4,16 +4,18 @@ include('../includes/config.php');
 include('../includes/guard_staff.php');
 
 $id = (int)($_GET['id'] ?? 0);
-$o = mysqli_fetch_assoc(mysqli_execute_query($conn, 'SELECT * FROM v_order_totals WHERE orderinfo_id = ?', [$id]));
+$o = fetch_order($conn, $id);
 if (!$o) {
     $_SESSION['message'] = 'That order does not exist.';
     header('Location: ' . BASE_URL . '/admin/orders.php');
     exit();
 }
-$lines    = mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT item_id, brand, model, img_path, quantity, unit_price, unit_cost, line_total FROM v_order_details WHERE orderinfo_id = ? ORDER BY item_id', [$id]), MYSQLI_ASSOC);
-$rcp      = $o['status'] === 'delivered' ? mysqli_fetch_assoc(mysqli_execute_query($conn, 'SELECT * FROM receipt WHERE orderinfo_id = ?', [$id])) : null;
-$subtotal = array_sum(array_column($lines, 'line_total'));
-$next     = ($nextStatuses[$o['status']] ?? []);
+
+$lines = fetch_order_lines($conn, $id);
+$subtotal = order_totals($lines, (float)$o['shipping'])['subtotal'];
+
+$rcp = $o['status'] === 'delivered' ? mysqli_fetch_assoc(mysqli_execute_query($conn, 'SELECT * FROM receipt WHERE orderinfo_id = ?', [$id])) : null;
+$next = ($nextStatuses[$o['status']] ?? []);
 if (!(($_SESSION['role'] ?? '') === 'admin')) {
     $next = array_values(array_diff($next, ['cancelled']));   // Only admins can cancel orders.
 }

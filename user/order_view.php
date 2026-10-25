@@ -5,8 +5,7 @@ include('../includes/config.php');
 include('../includes/guard_login.php');
 
 $id = (int)($_GET['id'] ?? 0);
-$o = mysqli_fetch_assoc(mysqli_execute_query($conn, 'SELECT o.*, c.user_id, c.title, c.fname, c.lname, c.addressline, c.town, c.zipcode, c.phone
-             FROM orderinfo o JOIN customer c ON c.customer_id = o.customer_id WHERE o.orderinfo_id = ?', [$id]));
+$o = fetch_order($conn, $id);
 $mine = $o && (int)$o['user_id'] === (int)$_SESSION['user_id'];
 if (!$o || (!$mine && !in_array($_SESSION['role'] ?? '', ['admin', 'employee']))) {
     http_response_code(404);
@@ -15,8 +14,8 @@ if (!$o || (!$mine && !in_array($_SESSION['role'] ?? '', ['admin', 'employee']))
     exit();
 }
 
-$lines    = mysqli_fetch_all(mysqli_execute_query($conn, 'SELECT item_id, brand, model, img_path, quantity, unit_price, unit_cost, line_total FROM v_order_details WHERE orderinfo_id = ? ORDER BY item_id', [$id]), MYSQLI_ASSOC);
-$subtotal = array_sum(array_column($lines, 'line_total'));
+$lines = fetch_order_lines($conn, $id);
+$subtotal = order_totals($lines, (float)$o['shipping'])['subtotal'];
 
 $pageTitle = 'Order #' . $id;
 include('../includes/header.php');

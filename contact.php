@@ -18,25 +18,44 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $_SESSION['warning'] = 'Please provide a valid name and email, and a message no longer than 5,000 characters.';
         $_SESSION['contact_old'] = ['name' => $name, 'email' => $email, 'message' => $message];
     } else {
-        $mailTo = 'lanstro@store.ph';
-        $mailSubject = 'Website contact form message';
-        $mailReplyTo = $email;
-        $mailAttachments = [];
-        $mailBody = '<h2>Website contact form message</h2>'
-            . '<p><strong>Name:</strong> ' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . '</p>'
-            . '<p><strong>Email:</strong> ' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '</p>'
-            . '<p><strong>Message:</strong></p><p>' . nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')) . '</p>';
-        include(ROOT_DIR . '/includes/mail_send.php');
-
-        if ($mailSent && MAIL_MODE === 'smtp') {
-            $_SESSION['success'] = 'Thanks for your message. We’ll get back to you soon.';
-            unset($_SESSION['contact_old']);
-        } elseif ($mailSent) {
-            $_SESSION['info'] = 'Your message was recorded locally, but email delivery is not configured. Please email us directly at lanstro@store.ph.';
-            unset($_SESSION['contact_old']);
-        } else {
-            $_SESSION['warning'] = 'We could not send your message right now. Please email us directly at lanstro@store.ph.';
+        $badText = $message;
+        include('includes/badwords.php');
+        if ($badFound) {
+            $_SESSION['warning'] = 'Your message was not sent because it contains language that is not allowed. Please reword it respectfully and try again.';
             $_SESSION['contact_old'] = ['name' => $name, 'email' => $email, 'message' => $message];
+        } else {
+            $mailTo = 'lanstro@store.ph';
+            $mailSubject = 'Website contact form message';
+            $mailReplyTo = $email;
+            $mailAttachments = [];
+            $safeName = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+            $safeEmail = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
+            $safeMessage = nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8'));
+            $layoutHeading = 'Website contact form message';
+            $layoutInner = '<p style="margin:0 0 20px;color:#555555">A visitor sent a message through the WatchStore contact form. Reply to this email to respond directly.</p>'
+                . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:0 0 20px">'
+                . '<tr><td style="width:90px;padding:10px 12px;border-top:1px solid #e5e5e5;color:#6b6b6b;font-size:13px;font-weight:bold;text-transform:uppercase">Name</td>'
+                . '<td style="padding:10px 12px;border-top:1px solid #e5e5e5;font-size:15px">' . $safeName . '</td></tr>'
+                . '<tr><td style="width:90px;padding:10px 12px;border-top:1px solid #e5e5e5;color:#6b6b6b;font-size:13px;font-weight:bold;text-transform:uppercase">Email</td>'
+                . '<td style="padding:10px 12px;border-top:1px solid #e5e5e5;font-size:15px"><a href="mailto:' . $safeEmail . '" style="color:#000000;text-decoration:underline">' . $safeEmail . '</a></td></tr></table>'
+                . '<p style="margin:0 0 8px;color:#6b6b6b;font-size:13px;font-weight:bold;letter-spacing:1px;text-transform:uppercase">Message</p>'
+                . '<div style="padding:16px 18px;border-left:3px solid #b49a68;background:#f5f5f5;font-size:15px;line-height:1.6;overflow-wrap:anywhere">' . $safeMessage . '</div>';
+            $layoutUrl = null;
+            $layoutFooter = 'WatchStore website contact form • Reply to this email to contact the sender.';
+            include(ROOT_DIR . '/includes/mail_layout.php');
+            include(ROOT_DIR . '/includes/mail_send.php');
+            $layoutFooter = null;
+
+            if ($mailSent && MAIL_MODE === 'smtp') {
+                $_SESSION['success'] = 'Thanks for your message. We’ll get back to you soon.';
+                unset($_SESSION['contact_old']);
+            } elseif ($mailSent) {
+                $_SESSION['info'] = 'Your message was recorded locally, but email delivery is not configured. Please email us directly at lanstro@store.ph.';
+                unset($_SESSION['contact_old']);
+            } else {
+                $_SESSION['warning'] = 'We could not send your message right now. Please email us directly at lanstro@store.ph.';
+                $_SESSION['contact_old'] = ['name' => $name, 'email' => $email, 'message' => $message];
+            }
         }
     }
 
@@ -52,12 +71,17 @@ include('includes/header.php');
 ?>
 <section class="info-page contact-page">
   <div class="contact-intro">
-    <p class="text-uppercase small mb-2">We’re here to help</p>
+    <p class="contact-kicker">We’re here to help</p>
     <h1>Contact Us</h1>
     <p class="lead">Have a question about a watch, your order, or the store? Send us a message and we’ll be happy to help.</p>
-    <p><strong>Email:</strong> <a href="mailto:lanstro@store.ph">lanstro@store.ph</a></p>
+    <a class="contact-email" href="mailto:lanstro@store.ph">
+      <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+      <span><strong>Email us</strong><br>lanstro@store.ph</span>
+      <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+    </a>
   </div>
   <div class="contact-form-wrap">
+    <p class="contact-kicker">Get in touch</p>
     <h2>Send us a message</h2>
     <form method="post" action="<?= BASE_URL ?>/contact.php" class="contact-form">
       <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string)$_SESSION['contact_csrf'], ENT_QUOTES, 'UTF-8') ?>">
