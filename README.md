@@ -72,8 +72,8 @@ PHPMailer is bundled in `includes/PHPMailer/`, so there is nothing to install wi
 - In the admin watch form, select the main photo and use **Add another photo** to create a separate picker for each gallery photo. The main photo appears first on the product page; the arrows navigate through the additional photos.
 - The database stores a relative path like `images/products/watch_ab12cd.jpg`. The pages build the image link from it, and show `assets/placeholder.svg` if the file is missing, so you never get a broken image.
 - Images used to break after cloning because the folder name was typed into `BASE_URL`. It is now detected from where the project sits, so it works in any folder.
-- `images/products/` is **not** ignored by git. Uploaded photos are saved there, but to make them available on GitHub you still need to commit the files along with the database export/seed data that references their relative paths. Avatars are ignored (they are user data).
-- The database is not part of the repo. If you want the watches (with their photos) to appear for whoever clones the project, export your database from phpMyAdmin and replace `database.sql`.
+- `images/products/` is **not** ignored by git. Commit uploaded photos along with the seed data that references their relative paths. The sample watches in `database.sql` already point to bundled photos; profile pictures are ignored because they are user data.
+- Watches added through the admin are stored in your local database, which Git does not sync. To share those products, add only their product, stock, and gallery rows to `database.sql` along with their photos. Do not export customer, account, or order data.
 
 ## Where each function lives
 | # | Function | File(s) |

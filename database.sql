@@ -156,16 +156,24 @@ INSERT INTO users (username, email, password, role) VALUES
 ('admin', 'admin@watchstore.test', '$2b$10$VTVlL6VAnslIDuxqKqtK3OQd/K3kMzIEv3V3V2nrDIQIxYcg5gJTG', 'admin');
 
 -- Sample watches.
-INSERT INTO item (brand, model, description, movement, category, case_size_mm, strap_type, water_resistance, cost_price, sell_price) VALUES
-('Casio',   'F-91W',            'Digital classic with alarm, stopwatch and daily chime.',            'quartz',    'unisex', 35, 'Resin',           '30 m',   550.00,  995.00),
-('Seiko',   '5 Sports SRPD',    'Automatic diver-style daily wear with day-date display.',          'automatic', 'men',    42, 'Stainless steel', '100 m', 9500.00, 14500.00),
-('Citizen', 'Eco-Drive BM7',    'Light-powered movement, no battery changes. Sapphire-coated look.', 'solar',     'men',    40, 'Leather',         '100 m', 8200.00, 12990.00),
-('Orient',  'Bambino Gen 2',    'Dress watch with domed crystal and in-house automatic movement.',   'automatic', 'men',    40, 'Leather',         '30 m',  7800.00, 11900.00),
-('Timex',   'Weekender 38',     'Easy everyday quartz with a quick-release fabric strap.',           'quartz',    'unisex', 38, 'Nylon',           '30 m',  1900.00,  3490.00),
-('Fossil',  'Carlyle Mini',     'Slim rose-tone dress watch sized for smaller wrists.',              'quartz',    'women',  34, 'Stainless steel', '50 m',  3600.00,  6450.00);
+INSERT INTO item (brand, model, description, movement, category, case_size_mm, strap_type, water_resistance, cost_price, sell_price, img_path) VALUES
+('Casio',   'F-91W',            'Digital classic with alarm, stopwatch and daily chime.',            'quartz',    'unisex', 35, 'Resin',           '30 m',   550.00,  995.00,  'images/products/watch_766bbc7b5ecf03a3.jpg'),
+('Seiko',   '5 Sports SRPD',    'Automatic diver-style daily wear with day-date display.',          'automatic', 'men',    42, 'Stainless steel', '100 m', 9500.00, 14500.00, 'images/products/watch_f1a14a3419a80d96.jpg'),
+('Citizen', 'Eco-Drive BM7',    'Light-powered movement, no battery changes. Sapphire-coated look.', 'solar',     'men',    40, 'Leather',         '100 m', 8200.00, 12990.00, 'images/products/watch_37b00c4ce6c72c02.jpg'),
+('Orient',  'Bambino Gen 2',    'Dress watch with domed crystal and in-house automatic movement.',   'automatic', 'men',    40, 'Leather',         '30 m',  7800.00, 11900.00, 'images/products/watch_d3a258416c648462.jpg'),
+('Timex',   'Weekender 38',     'Easy everyday quartz with a quick-release fabric strap.',           'quartz',    'unisex', 38, 'Nylon',           '30 m',  1900.00,  3490.00, 'images/products/watch_500a5c15a66162f6.png'),
+('Fossil',  'Carlyle Mini',     'Slim rose-tone dress watch sized for smaller wrists.',              'quartz',    'women',  34, 'Stainless steel', '50 m',  3600.00,  6450.00, 'images/products/watch_990ca7cf1ba3f02b.jpg');
 
 INSERT INTO stock (item_id, quantity, low_stock_level) VALUES
 (1, 25, 5), (2, 8, 3), (3, 6, 3), (4, 4, 3), (5, 15, 5), (6, 2, 3);
+
+INSERT INTO item_image (item_id, img_path) VALUES
+(1, 'images/products/watch_f425570d012b489d.jpg'), (1, 'images/products/watch_c72517c005fc50ee.jpg'),
+(2, 'images/products/watch_669a40a25ea2e6b4.jpg'), (2, 'images/products/watch_d7baa75ddf9cc4ca.png'),
+(3, 'images/products/watch_516639481bb1a763.jpg'), (3, 'images/products/watch_b69792ee1464b208.jpg'),
+(4, 'images/products/watch_06d8205fa97f1831.jpg'), (4, 'images/products/watch_48c88dee10a4cbae.jpg'),
+(5, 'images/products/watch_92f7fef1cb276897.jpg'), (5, 'images/products/watch_765aa70e7becd954.jpg'),
+(6, 'images/products/watch_1f4f419de40860f5.jpg'), (6, 'images/products/watch_243ffd4457d19dd5.jpg');
 
 
 -- One row per order line; totals are calculated in PHP from these raw values.

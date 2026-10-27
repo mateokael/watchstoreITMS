@@ -246,7 +246,7 @@ include('../includes/header.php');
       const isPie = cfg.type === 'doughnut';
       const fmt = v => cfg.money ? cur + Number(v).toLocaleString(undefined, {minimumFractionDigits: 2}) : Number(v).toLocaleString();
       const axis = { beginAtZero: true, ticks: { callback: v => cfg.money ? cur + Number(v).toLocaleString() : v } };
-      new Chart(document.getElementById('reportChart'), {
+      const reportChart = new Chart(document.getElementById('reportChart'), {
         type: cfg.type,
         data: { labels: cfg.labels, datasets: cfg.datasets },
         options: {
@@ -262,6 +262,8 @@ include('../includes/header.php');
           scales: isPie ? {} : (cfg.horizontal ? { x: axis } : { y: axis })
         }
       });
+      window.addEventListener('beforeprint', () => reportChart.resize());
+      window.addEventListener('afterprint', () => reportChart.resize());
     </script>
   <?php endif; ?>
 <?php endif; ?>

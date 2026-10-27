@@ -15,14 +15,17 @@ if (($upFile['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
         $upError = 'Only JPG, PNG or WEBP images are allowed.';
     } else {
         $upDir = ROOT_DIR . '/images/' . $upFolder . '/';
-        if (!is_dir($upDir)) {
-            mkdir($upDir, 0775, true);
-        }
-        $upName = $upPrefix . bin2hex(random_bytes(8)) . '.' . $upExt;
-        if (move_uploaded_file($upFile['tmp_name'], $upDir . $upName)) {
-            $upPath = 'images/' . $upFolder . '/' . $upName;
-        } else {
+        if (!is_dir($upDir) && !mkdir($upDir, 0775, true) && !is_dir($upDir)) {
+            $upError = 'Could not create the images folder. Please check folder permissions.';
+        } elseif (!is_writable($upDir)) {
             $upError = 'Could not save the image. Is the images folder writable?';
+        } else {
+            $upName = $upPrefix . bin2hex(random_bytes(8)) . '.' . $upExt;
+            if (move_uploaded_file($upFile['tmp_name'], $upDir . $upName)) {
+                $upPath = 'images/' . $upFolder . '/' . $upName;
+            } else {
+                $upError = 'Could not save the image. Is the images folder writable?';
+            }
         }
     }
 }

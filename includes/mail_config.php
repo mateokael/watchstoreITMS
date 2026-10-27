@@ -11,7 +11,7 @@ define('MAIL_PASS', '0509388e4b7607');
 define('MAIL_FROM', 'orders@watchstore.test');      // any address works, Mailtrap never delivers it
 define('MAIL_FROM_NAME', 'WatchStore');
 
-// Optional: get an email every time someone places an order ('' = off)
+// get an email every time someone places an order ('' = off)
 define('ADMIN_EMAIL', '');
 
 

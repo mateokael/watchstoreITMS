@@ -230,7 +230,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .stat { background: #fff; border: 1px solid var(--steel); border-radius: 6px; padding: 1rem 1.25rem; }
 .stat .figure { font-family: 'Instrument Serif', Georgia, serif; font-size: 2.2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .table > :not(caption) > * > * { vertical-align: middle; }
-.admin-thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 4px; background: #fff; }
+.admin-thumb { width: 56px; height: 56px; object-fit: contain; border-radius: 4px; background: #f5f3ee; }
 .row-inactive { opacity: .55; }
 
 /* avatars + profile page */
