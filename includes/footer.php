@@ -29,8 +29,8 @@
         </ul>
       </div>
       <div class="col-12 col-md-3">
-        <h3 class="footer-title">Email updates</h3>
-        <p class="footer-text mb-0">Confirmation, shipped and delivered, straight to your inbox.</p>
+        <h3 class="footer-title">Contact us</h3>
+        <p class="footer-text mb-0"><a href="<?= BASE_URL ?>/contact.php">Get in touch with us</a> if you have a question.</p>
       </div>
     </div>
 

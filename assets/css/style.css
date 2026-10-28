@@ -89,6 +89,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .footer-brand .brand-watch-o::before, .footer-brand .brand-watch-o::after { background: repeating-linear-gradient(to bottom, var(--accent) 0 .09em, #000 .09em .14em); }
 .footer-title { font-family: 'Roboto Condensed', sans-serif; font-size: 1.05rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 1rem; color: #fff; }
 .footer-text { color: #bbb; max-width: 42ch; }
+.footer-text a { color: #fff; text-decoration: underline; text-underline-offset: .15em; }
+.footer-text a:hover, .footer-text a:focus-visible { color: var(--accent); }
 .footer-links { list-style: none; padding: 0; margin: 0; display: grid; gap: .6rem; }
 .footer-links a { color: #bbb; text-decoration: none; text-transform: uppercase; font-family: 'Roboto Condensed', sans-serif; }
 .footer-links a:hover { color: var(--accent); text-decoration: underline; }
