@@ -248,9 +248,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 767.98px) { .home-featured .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .home-showcase { position: relative; left: 50%; width: 100vw; margin: 3rem 0 0 -50vw; padding: 0 clamp(1rem, 3vw, 3.5rem); }
 .home-showcase .carousel-inner { background: #000; }
-.home-showcase__slide { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); min-height: 340px; overflow: hidden; color: #fff; text-decoration: none; background: linear-gradient(105deg, #000 0%, #080704 55%, #171207 100%); }
-.home-showcase__image { display: grid; place-items: center; min-height: 340px; padding: clamp(1rem, 3vw, 3rem); background: #f5f3ee; }
-.home-showcase__image img { display: block; width: 100%; height: 100%; max-height: 410px; object-fit: contain; transition: transform .45s ease; }
+.home-showcase__slide { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); min-height: clamp(440px, 42vw, 640px); overflow: hidden; color: #fff; text-decoration: none; background: linear-gradient(105deg, #000 0%, #080704 55%, #171207 100%); }
+.home-showcase__image { display: grid; place-items: center; min-height: inherit; padding: clamp(1rem, 3vw, 3rem); background: #f5f3ee; }
+.home-showcase__image img { display: block; width: 100%; height: 100%; max-height: 580px; object-fit: contain; transition: transform .45s ease; }
 .home-showcase__slide:hover .home-showcase__image img { transform: scale(1.035); }
 .home-showcase__copy { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: clamp(2rem, 6vw, 6rem); }
 .home-showcase__eyebrow { margin-bottom: 1rem; color: var(--accent); font-family: 'Roboto Condensed', sans-serif; font-size: .9rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
@@ -265,8 +265,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .home-showcase .carousel-indicators .active { opacity: 1; }
 @media (max-width: 767.98px) {
   .home-showcase__slide { grid-template-columns: 1fr; }
-  .home-showcase__image { min-height: 250px; max-height: 300px; padding: 1rem 3rem; }
-  .home-showcase__image img { max-height: 270px; }
+  .home-showcase__image { min-height: 320px; max-height: 360px; padding: 1rem 3rem; }
+  .home-showcase__image img { max-height: 320px; }
   .home-showcase__copy { min-height: 210px; padding: 2rem 3.5rem 3rem; }
   .home-showcase__copy h2 { font-size: clamp(2rem, 9vw, 3rem); }
 }
