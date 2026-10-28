@@ -49,14 +49,14 @@ $soldOut = (int)$it['stock'] < 1;
       <div id="gallery" class="carousel slide main-shot" data-bs-ride="false">
         <div class="carousel-inner">
           <?php foreach ($images as $n => $p): ?>
-            <div class="carousel-item <?= $n === 0 ? 'active' : '' ?>"><img src="<?= htmlspecialchars((string)((is_file(ROOT_DIR . '/' . $p) ? BASE_URL . '/' . $p : BASE_URL . '/assets/placeholder.svg'))) ?>" alt="<?= htmlspecialchars((string)(($it['brand'] . ' ' . $it['model']))) ?>, photo <?= $n + 1 ?>"></div>
+            <div class="carousel-item <?= $n === 0 ? 'active' : '' ?>"><img src="<?= htmlspecialchars(product_image_url($p)) ?>" alt="<?= htmlspecialchars((string)(($it['brand'] . ' ' . $it['model']))) ?>, photo <?= $n + 1 ?>"></div>
           <?php endforeach; ?>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#gallery" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous photo</span></button>
         <button class="carousel-control-next" type="button" data-bs-target="#gallery" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next photo</span></button>
       </div>
     <?php else: ?>
-      <div class="main-shot"><img src="<?= htmlspecialchars((string)((is_file(ROOT_DIR . '/' . ($images[0] ?? '')) ? BASE_URL . '/' . $images[0] : BASE_URL . '/assets/placeholder.svg'))) ?>" alt="<?= htmlspecialchars((string)(($it['brand'] . ' ' . $it['model']))) ?>"></div>
+      <div class="main-shot"><img src="<?= htmlspecialchars(product_image_url($images[0] ?? null)) ?>" alt="<?= htmlspecialchars((string)(($it['brand'] . ' ' . $it['model']))) ?>"></div>
     <?php endif; ?>
   </div>
 

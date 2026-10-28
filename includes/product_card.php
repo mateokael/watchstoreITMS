@@ -16,7 +16,7 @@ $soldOut = (int)$it['stock'] < 1;
       <?php endif; ?>
     </div>
     <a class="product-thumb" href="<?= BASE_URL . '/product.php?id=' . $id ?>">
-      <img src="<?= htmlspecialchars((string)((is_file(ROOT_DIR . '/' . $it['img_path']) ? BASE_URL . '/' . $it['img_path'] : BASE_URL . '/assets/placeholder.svg'))) ?>" alt="<?= htmlspecialchars((string)(($it['brand'] . ' ' . $it['model']))) ?>" loading="lazy">
+      <img src="<?= htmlspecialchars(product_image_url($it['img_path'])) ?>" alt="<?= htmlspecialchars((string)(($it['brand'] . ' ' . $it['model']))) ?>" loading="lazy">
     </a>
     <div class="product-body">
       <span class="product-brand"><?= htmlspecialchars((string)$it['brand']) ?></span>

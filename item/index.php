@@ -47,7 +47,7 @@ include('../includes/header.php');
     <?php if (!$items): ?><tr><td colspan="<?= $isAdmin ? 8 : 6 ?>" class="text-center text-secondary py-4">No watches found.</td></tr><?php endif; ?>
     <?php foreach ($items as $it): $id = (int)$it['item_id']; $low = (int)$it['quantity'] <= (int)$it['low_stock_level']; ?>
       <tr class="<?= $it['is_active'] ? '' : 'row-inactive' ?>">
-        <td><img class="admin-thumb" src="<?= htmlspecialchars((string)((is_file(ROOT_DIR . '/' . $it['img_path']) ? BASE_URL . '/' . $it['img_path'] : BASE_URL . '/assets/placeholder.svg'))) ?>" alt=""></td>
+        <td><img class="admin-thumb" src="<?= htmlspecialchars(product_image_url($it['img_path'])) ?>" alt=""></td>
         <td><a href="<?= BASE_URL . '/product.php?id=' . $id ?>"><?= htmlspecialchars((string)(($it['brand'] . ' ' . $it['model']))) ?></a><div class="small text-secondary">#<?= $id ?></div></td>
         <td><?= ucfirst($it['movement']) ?></td>
         <?php if ($isAdmin): ?><td class="num text-end"><?= (CURRENCY . number_format($it['cost_price'], 2)) ?></td><?php endif; ?>

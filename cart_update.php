@@ -2,6 +2,7 @@
 // Handles every cart action: add, update (quantities + remove), clear
 session_start();
 include('includes/config.php');
+include('includes/cart_store.php');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . BASE_URL . '/index.php');
     exit();
@@ -32,6 +33,7 @@ if ($action === 'add') {
         }
     }
     $_SESSION['cart'] = $cart;
+    cart_sync($conn);
     header('Location: ' . $back);
     exit();
 }
@@ -53,9 +55,9 @@ if ($action === 'update') {
         }
     }
     $_SESSION['cart'] = $cart;
-    $asked = $cart;
     include('includes/cart_lines.php');
-    if ($_SESSION['cart'] != $asked) {
+    cart_sync($conn);
+    if ($_SESSION['cart'] != $cart) {
         $_SESSION['warning'] = 'Some quantities were lowered to what we have in stock.';
     } else {
         $_SESSION['success'] = 'Cart updated.';
@@ -66,6 +68,7 @@ if ($action === 'update') {
 
 if ($action === 'clear') {
     unset($_SESSION['cart']);
+    cart_sync($conn);
     $_SESSION['info'] = 'Your cart is empty.';
 }
 header('Location: ' . BASE_URL . '/view_cart.php');

@@ -1,6 +1,7 @@
 <?php
 session_start();
 include('includes/config.php');
+include('includes/cart_store.php');
 include('includes/guard_login.php');
 
 $uid = (int)$_SESSION['user_id'];
@@ -67,6 +68,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         exit();
     }
     unset($_SESSION['cart']);
+    cart_sync($conn);
     $emailOrderId = $orderId;
     $emailType = 'placed';
     include('includes/order_email.php');

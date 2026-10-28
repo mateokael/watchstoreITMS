@@ -36,6 +36,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 $_SESSION['role'] = $row['role'];
                 $_SESSION['username'] = $row['username'];
                 $_SESSION['avatar'] = $row['profile_pic'] ?? null;
+                include('../includes/cart_store.php');
+                $merged = cart_load($conn, (int)$row['user_id']);
+                  foreach (($_SESSION['cart'] ?? []) as $iid => $q) {      // items added before logging in
+                    $merged[(int)$iid] = ($merged[(int)$iid] ?? 0) + (int)$q;
+                }
+                $_SESSION['cart'] = $merged;
+                cart_sync($conn);
                 $next = $_SESSION['next'] ?? null;
                 unset($_SESSION['next']);
                 unset($_SESSION['old'], $_SESSION['errors']);

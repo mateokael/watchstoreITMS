@@ -65,7 +65,7 @@ include('includes/header.php');
         <div class="carousel-item <?= $n === 0 ? 'active' : '' ?>">
           <a class="home-showcase__slide" href="<?= BASE_URL ?>/product.php?id=<?= (int)$watch['item_id'] ?>">
             <div class="home-showcase__image">
-              <img src="<?= htmlspecialchars((string)(is_file(ROOT_DIR . '/' . $watch['img_path']) ? BASE_URL . '/' . $watch['img_path'] : BASE_URL . '/assets/placeholder.svg')) ?>" alt="<?= htmlspecialchars((string)($watch['brand'] . ' ' . $watch['model'])) ?>" loading="lazy">
+              <img src="<?= htmlspecialchars(product_image_url($watch['img_path'])) ?>" alt="<?= htmlspecialchars((string)($watch['brand'] . ' ' . $watch['model'])) ?>" loading="lazy">
             </div>
             <div class="home-showcase__copy">
               <span class="home-showcase__eyebrow">A closer look</span>

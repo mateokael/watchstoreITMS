@@ -1,14 +1,16 @@
 # WatchStore
 
-Plain PHP + MySQLi + Bootstrap 5 (includes, one page per job, session cart).
+Plain PHP + MySQLi + Bootstrap 5 (includes, one page per job, session carts for guests and saved carts for logged-in users).
 
 ## Setup (XAMPP)
 1. Put the project folder in `htdocs`. **Any folder name works**: the base URL is detected automatically (see "Images and GitHub").
 2. Start Apache and MySQL, open phpMyAdmin, **Import** `database.sql` (it creates `db_watchstoreproj`).
-   - Already have an older database with data? Run `assets/migration.sql` first if its schema is missing the current columns, then run `assets/views.sql` to install the current order-detail view without deleting data.
+   - Already have an older database with data? Run `assets/migration.sql` if its schema is missing the current columns. Run `assets/cart_migration.sql` to enable saved carts (safe to run even if the cart table already exists), then `assets/views.sql` to install the current order-detail view without deleting data.
 3. Open `http://localhost/<your-folder>/`
 4. Admin login: `admin@watchstore.test` / `admin123`. Change it from **My profile**.
 5. Settings (currency, shipping fee, DB login) are at the top of `includes/config.php`.
+
+Product photos are stored in `images/products/` and use repository-relative paths in the database, so they resolve from any clone folder. Keep committed product photos in Git when adding them; photos that exist only on one computer cannot be included by pulling the repository.
 
 ## ITIM211 rubric coverage
 

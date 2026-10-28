@@ -34,7 +34,7 @@ $gallery = $gallery ?? [];
           <label class="form-label" for="img_path">Main photo</label>
           <input type="file" class="form-control" id="img_path" name="img_path" accept="image/jpeg,image/png,image/webp">
           <div class="form-text">JPG, PNG or WEBP, up to 3 MB.<?= $item ? ' Leave empty to keep the current photo.' : '' ?></div>
-          <?php if ($item && $item['img_path']): ?><img class="admin-thumb mt-2" style="width:96px;height:96px" src="<?= htmlspecialchars((string)((is_file(ROOT_DIR . '/' . $item['img_path']) ? BASE_URL . '/' . $item['img_path'] : BASE_URL . '/assets/placeholder.svg'))) ?>" alt="Current main photo"><?php endif; ?>
+          <?php if ($item && $item['img_path']): ?><img class="admin-thumb mt-2" style="width:96px;height:96px" src="<?= htmlspecialchars(product_image_url($item['img_path'])) ?>" alt="Current main photo"><?php endif; ?>
         </div>
         <div class="col-md-6">
           <label class="form-label" for="gallery-photo-1">More photos (optional)</label>
@@ -49,7 +49,7 @@ $gallery = $gallery ?? [];
             <div class="d-flex flex-wrap gap-3 mt-2">
               <?php foreach ($gallery as $g): ?>
                 <label class="small text-center">
-                  <img class="admin-thumb d-block mb-1" style="width:72px;height:72px" src="<?= htmlspecialchars((string)((is_file(ROOT_DIR . '/' . $g['img_path']) ? BASE_URL . '/' . $g['img_path'] : BASE_URL . '/assets/placeholder.svg'))) ?>" alt="">
+                  <img class="admin-thumb d-block mb-1" style="width:72px;height:72px" src="<?= htmlspecialchars(product_image_url($g['img_path'])) ?>" alt="">
                   <input type="checkbox" name="remove_images[]" value="<?= (int)$g['image_id'] ?>"> Remove
                 </label>
               <?php endforeach; ?>

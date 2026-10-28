@@ -4,7 +4,7 @@ USE db_watchstoreproj;
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP VIEW IF EXISTS v_order_totals, v_order_details;
-DROP TABLE IF EXISTS receipt, expense, expense_category, password_resets, wishlist, review, orderline, orderinfo, item_image, stock, item, customer, users;
+DROP TABLE IF EXISTS receipt, expense, expense_category, password_resets, cart, wishlist, review, orderline, orderinfo, item_image, stock, item, customer, users;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE users (
@@ -63,6 +63,15 @@ CREATE TABLE stock (
   item_id         INT PRIMARY KEY,
   quantity        INT NOT NULL DEFAULT 0,
   low_stock_level INT NOT NULL DEFAULT 3,
+  FOREIGN KEY (item_id) REFERENCES item(item_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE cart (
+  user_id   INT NOT NULL,
+  item_id   INT NOT NULL,
+  quantity  INT NOT NULL,
+  PRIMARY KEY (user_id, item_id),
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
   FOREIGN KEY (item_id) REFERENCES item(item_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

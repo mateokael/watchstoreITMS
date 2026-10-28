@@ -1,6 +1,16 @@
 -- Run once on an existing database; new installs should import database.sql instead.
 USE db_watchstoreproj;
 
+-- Persist each user's cart across sessions.
+CREATE TABLE IF NOT EXISTS cart (
+  user_id   INT NOT NULL,
+  item_id   INT NOT NULL,
+  quantity  INT NOT NULL,
+  PRIMARY KEY (user_id, item_id),
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (item_id) REFERENCES item(item_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 -- Add usernames and profile photos.
 ALTER TABLE users
   ADD COLUMN username VARCHAR(30) NULL AFTER user_id,

@@ -34,6 +34,9 @@ if (!defined('BASE_URL')) {
     $docRoot = rtrim(str_replace('\\', '/', (string)realpath($_SERVER['DOCUMENT_ROOT'] ?? '')), '/');
     define('BASE_URL', ($docRoot !== '' && stripos(ROOT_DIR, $docRoot) === 0) ? substr(ROOT_DIR, strlen($docRoot)) : '');
 }
+
+require_once __DIR__ . '/product_images.php';
+
 // Build the public URL for email links.
 if (!defined('APP_URL')) {
     $https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';

@@ -26,7 +26,7 @@ include('includes/header.php');
       <tbody>
       <?php foreach ($lines as $l): $id = (int)$l['item_id']; ?>
         <tr>
-          <td style="width:80px"><img class="cart-thumb" src="<?= htmlspecialchars((string)((is_file(ROOT_DIR . '/' . $l['img_path']) ? BASE_URL . '/' . $l['img_path'] : BASE_URL . '/assets/placeholder.svg'))) ?>" alt=""></td>
+          <td style="width:80px"><img class="cart-thumb" src="<?= htmlspecialchars(product_image_url($l['img_path'])) ?>" alt=""></td>
           <td><a href="<?= BASE_URL . '/product.php?id=' . $id ?>"><?= htmlspecialchars((string)(($l['brand'] . ' ' . $l['model']))) ?></a><div class="small text-secondary"><?= (int)$l['stock'] ?> in stock</div></td>
           <td class="num text-end"><?= (CURRENCY . number_format($l['sell_price'], 2)) ?></td>
           <td><input type="number" class="form-control" name="qty[<?= $id ?>]" value="<?= (int)$l['qty'] ?>" min="0" max="<?= (int)$l['stock'] ?>" aria-label="Quantity for <?= htmlspecialchars((string)(($l['brand'] . ' ' . $l['model']))) ?>"></td>

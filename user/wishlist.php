@@ -23,7 +23,7 @@ include('../includes/header.php');
     <tbody>
     <?php foreach ($items as $it): $id = (int)$it['item_id']; $ok = $it['is_active'] && (int)$it['stock'] > 0; ?>
       <tr>
-        <td style="width:80px"><img class="cart-thumb" src="<?= htmlspecialchars((string)((is_file(ROOT_DIR . '/' . $it['img_path']) ? BASE_URL . '/' . $it['img_path'] : BASE_URL . '/assets/placeholder.svg'))) ?>" alt=""></td>
+        <td style="width:80px"><img class="cart-thumb" src="<?= htmlspecialchars(product_image_url($it['img_path'])) ?>" alt=""></td>
         <td><a href="<?= BASE_URL . '/product.php?id=' . $id ?>"><?= htmlspecialchars((string)(($it['brand'] . ' ' . $it['model']))) ?></a>
           <div class="small text-secondary"><?= !$it['is_active'] ? 'No longer sold' : ((int)$it['stock'] < 1 ? 'Sold out' : 'In stock') ?></div></td>
         <td class="num text-end"><?= (CURRENCY . number_format($it['sell_price'], 2)) ?></td>
