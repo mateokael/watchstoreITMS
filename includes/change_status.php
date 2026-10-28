@@ -1,6 +1,7 @@
 <?php
 // Changes the status of an order.
 $statusError = null;
+$statusWarning = null;
 if (!in_array($statusNew, ORDER_STATUSES, true)) {
     $statusError = 'Unknown status.';
 } else {
@@ -42,6 +43,8 @@ if (!in_array($statusNew, ORDER_STATUSES, true)) {
                 $receiptDeliver = false;
                 include(ROOT_DIR . '/includes/receipt_issue.php');
             } catch (Throwable $stReceiptError) {
+                error_log("Could not issue receipt for order #$statusOrderId: " . $stReceiptError->getMessage());
+                $statusWarning = 'The order was delivered, but its receipt could not be issued. Check the PHP error log.';
             }
         }
         $emailOrderId = $statusOrderId;

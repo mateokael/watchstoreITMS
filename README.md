@@ -4,8 +4,7 @@ Plain PHP + MySQLi + Bootstrap 5 (includes, one page per job, session carts for 
 
 ## Setup (XAMPP)
 1. Put the project folder in `htdocs`. **Any folder name works**: the base URL is detected automatically (see "Images and GitHub").
-2. Start Apache and MySQL, open phpMyAdmin, **Import** `database.sql` (it creates `db_watchstoreproj`).
-   - Already have an older database with data? Run `assets/migration.sql` if its schema is missing the current columns. Run `assets/cart_migration.sql` to enable saved carts (safe to run even if the cart table already exists), then `assets/views.sql` to install the current order-detail view without deleting data.
+2. Start Apache and MySQL, open phpMyAdmin, **Import** `database.sql` (it creates `db_watchstoreproj`). This script drops and recreates the project tables, so back up existing data first. Upgrade scripts for an existing database are not included.
 3. Open `http://localhost/<your-folder>/`
 4. Admin login: `admin@watchstore.test` / `admin123`. Change it from **My profile**.
 5. Settings (currency, shipping fee, DB login) are at the top of `includes/config.php`.
@@ -27,7 +26,7 @@ Product photos are stored in `images/products/` and use repository-relative path
 | Quiz 3: homepage search | Search from `index.php` submits to the shop's prepared, parameterized product search in `shop.php` |
 
 ## Version 3: employees, expenses, reports (class requirements)
-**Already have the database imported?** Run `assets/migration.sql` once (the new part is at the bottom, "Version 3"), then `assets/views.sql` if you need to refresh the order-details view. For a new setup, import `database.sql`. This project does not include a separate demo-data SQL file.
+For a new setup, import `database.sql`. It includes the current schema, order-details view, and sample data. This project does not include a separate demo-data SQL file or upgrade scripts for existing databases.
 
 | Requirement | Where (log in as admin) |
 |---|---|
@@ -64,8 +63,8 @@ Out of the box email is in **log mode**: nothing is sent, each email is written 
 
 To send email through the required Mailtrap service:
 1. Copy `includes/mail_config.sample.php` to `includes/mail_config.php`.
-2. Replace the sample username and password with the credentials for your Mailtrap Email Testing inbox, then set `MAIL_MODE` to `smtp`.
-3. `mail_config.php` is in `.gitignore`, so credentials are not pushed to GitHub. Never commit Mailtrap credentials.
+2. Replace the sample username and password with the credentials for your Mailtrap Email Testing inbox.
+3. Keep `mail_config.php` local; it is ignored by Git. Never commit Mailtrap credentials. If credentials were previously committed or shared, rotate them in Mailtrap.
 
 PHPMailer is bundled in `includes/PHPMailer/`, so there is nothing to install with Composer. If an email fails to send, the order or account action still goes through and the reason is written to `logs/mail-error.log`.
 

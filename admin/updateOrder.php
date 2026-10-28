@@ -20,6 +20,10 @@ include('../includes/change_status.php');
 $err = $statusError;
 if ($err) {
     $_SESSION['message'] = $err;
+} elseif ($statusWarning) {
+    $_SESSION['warning'] = $statusWarning . (!$mailSent
+        ? ' The transaction notification email also could not be sent. Check logs/mail-error.log.'
+        : '');
 } elseif (!$mailSent) {
     $_SESSION['warning'] = "Order #$id is now $new, but its notification email with the transaction PDF could not be sent. Check logs/mail-error.log.";
 } else {
