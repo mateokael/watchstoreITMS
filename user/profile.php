@@ -156,12 +156,14 @@ include('../includes/header.php');
           <label class="form-label small" for="avatar">Change picture</label>
           <input type="file" class="form-control form-control-sm mb-2" id="avatar" name="avatar" accept="image/jpeg,image/png,image/webp">
           <div class="form-text mb-2">JPG, PNG or WEBP, up to 3 MB.</div>
+          <img id="avatar-preview" class="avatar-upload-preview mb-2" alt="Selected profile photo preview" hidden>
           <div class="d-flex gap-2">
             <button class="btn btn-primary btn-sm" type="submit">Upload</button>
             <?php if ($me['profile_pic']): ?>
               <button class="btn btn-outline-danger btn-sm" type="submit" name="remove" value="1" formnovalidate onclick="return confirm('Remove your profile picture?');">Remove</button>
             <?php endif; ?>
           </div>
+
         </form>
       </div>
     </div>
@@ -223,4 +225,27 @@ include('../includes/header.php');
     </form>
   </div>
 </div>
+
+<script>
+(() => {
+  const input = document.getElementById('avatar');
+  const preview = document.getElementById('avatar-preview');
+  if (!input || !preview) return;
+
+  let previewUrl = null;
+  input.addEventListener('change', () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = null;
+    preview.hidden = true;
+    preview.removeAttribute('src');
+
+    const file = input.files && input.files[0];
+    if (file) {
+      previewUrl = URL.createObjectURL(file);
+      preview.src = previewUrl;
+      preview.hidden = false;
+    }
+  });
+})();
+</script>
 <?php unset($_SESSION['old'], $_SESSION['errors']); include('../includes/footer.php'); ?>

@@ -34,10 +34,33 @@ include('../includes/header.php');
         <label for="avatar" class="form-label">Profile photo <span class="text-secondary small">(optional)</span></label>
         <input type="file" class="form-control" id="avatar" name="avatar" accept="image/jpeg,image/png,image/webp">
         <div class="form-text">JPG, PNG or WEBP, up to 3 MB. You can change it later from your profile.</div>
+        <img id="avatar-preview" class="avatar-upload-preview mt-3" alt="Selected profile photo preview" hidden>
       </div>
       <button type="submit" class="btn btn-primary w-100">Create account</button>
       <p class="mt-3 mb-0 small">Already registered? <a href="<?= BASE_URL ?>/user/login.php">Log in</a></p>
     </form>
   </div>
 </div>
+<script>
+(() => {
+  const input = document.getElementById('avatar');
+  const preview = document.getElementById('avatar-preview');
+  if (!input || !preview) return;
+
+  let previewUrl = null;
+  input.addEventListener('change', () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = null;
+    preview.hidden = true;
+    preview.removeAttribute('src');
+
+    const file = input.files && input.files[0];
+    if (file) {
+      previewUrl = URL.createObjectURL(file);
+      preview.src = previewUrl;
+      preview.hidden = false;
+    }
+  });
+})();
+</script>
 <?php unset($_SESSION['old'], $_SESSION['errors']); include('../includes/footer.php'); ?>

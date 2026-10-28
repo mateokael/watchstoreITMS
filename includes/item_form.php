@@ -34,13 +34,17 @@ $gallery = $gallery ?? [];
           <label class="form-label" for="img_path">Main photo</label>
           <input type="file" class="form-control" id="img_path" name="img_path" accept="image/jpeg,image/png,image/webp">
           <div class="form-text">JPG, PNG or WEBP, up to 3 MB.<?= $item ? ' Leave empty to keep the current photo.' : '' ?></div>
+          <img id="main-photo-preview" class="admin-thumb mt-2" style="width:96px;height:96px" alt="Selected main photo preview" hidden>
           <?php if ($item && $item['img_path']): ?><img class="admin-thumb mt-2" style="width:96px;height:96px" src="<?= htmlspecialchars(product_image_url($item['img_path'])) ?>" alt="Current main photo"><?php endif; ?>
         </div>
         <div class="col-md-6">
           <label class="form-label" for="gallery-photo-1">More photos (optional)</label>
           <div id="gallery-uploads" class="d-grid gap-2">
-            <div class="input-group gallery-upload-row">
-              <input type="file" class="form-control" id="gallery-photo-1" name="gallery[]" accept="image/jpeg,image/png,image/webp">
+            <div class="gallery-upload-entry">
+              <div class="input-group gallery-upload-row">
+                <input type="file" class="form-control" id="gallery-photo-1" name="gallery[]" accept="image/jpeg,image/png,image/webp">
+              </div>
+              <img class="admin-thumb mt-2 gallery-photo-preview" style="width:72px;height:72px" alt="Selected gallery photo preview" hidden>
             </div>
           </div>
           <button class="btn btn-sm btn-outline-primary mt-2" id="add-gallery-photo" type="button" hidden>Add another photo</button>
@@ -68,10 +72,39 @@ $gallery = $gallery ?? [];
   const addButton = document.getElementById('add-gallery-photo');
   if (!uploads || !addButton) return;
 
+  const setPreview = (input, preview) => {
+    let previewUrl = null;
+    input.addEventListener('change', () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      previewUrl = null;
+      preview.hidden = true;
+      preview.removeAttribute('src');
+
+      const file = input.files && input.files[0];
+      if (file) {
+        previewUrl = URL.createObjectURL(file);
+        preview.src = previewUrl;
+        preview.hidden = false;
+      }
+    });
+  };
+
+  const mainPhoto = document.getElementById('img_path');
+  const mainPreview = document.getElementById('main-photo-preview');
+  if (mainPhoto && mainPreview) setPreview(mainPhoto, mainPreview);
+
+  uploads.querySelectorAll('.gallery-upload-entry').forEach((entry) => {
+    const input = entry.querySelector('input[type="file"]');
+    const preview = entry.querySelector('.gallery-photo-preview');
+    if (input && preview) setPreview(input, preview);
+  });
+
   let photoNumber = 1;
   addButton.hidden = false;
   addButton.addEventListener('click', () => {
     photoNumber += 1;
+    const entry = document.createElement('div');
+    entry.className = 'gallery-upload-entry';
     const row = document.createElement('div');
     row.className = 'input-group gallery-upload-row';
 
@@ -87,10 +120,19 @@ $gallery = $gallery ?? [];
     removeButton.className = 'btn btn-outline-danger';
     removeButton.textContent = 'Remove';
     removeButton.setAttribute('aria-label', `Remove photo ${photoNumber} picker`);
-    removeButton.addEventListener('click', () => row.remove());
+    removeButton.addEventListener('click', () => entry.remove());
 
     row.append(input, removeButton);
-    uploads.append(row);
+    const preview = document.createElement('img');
+    preview.className = 'admin-thumb mt-2 gallery-photo-preview';
+    preview.style.width = '72px';
+    preview.style.height = '72px';
+    preview.alt = 'Selected gallery photo preview';
+    preview.hidden = true;
+    setPreview(input, preview);
+
+    entry.append(row, preview);
+    uploads.append(entry);
     input.focus();
   });
 })();
